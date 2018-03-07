@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="Think-a-bit:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/Think_a_bit_war_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="Think-a-bit/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="Think-a-bit" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
