@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="Think-a-bit:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="Think-a-bit-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="Think-a-bit:war exploded" />
+    </root>
+  </artifact>
+</component>
