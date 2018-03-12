@@ -11,6 +11,7 @@
     <title>$Title$</title>
   </head>
   <body>
-  $ENDE
+    <div id="content"></div>
+    <script src="bundle.js"></script>
   </body>
 </html>

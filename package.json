@@ -1,0 +1,50 @@
+{
+  "name": "think-a-bit",
+  "version": "1.0.0",
+  "description": "Online game with questions",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/radito3/Think-a-bit.git"
+  },
+  "keywords": [
+    "think",
+    "bit",
+    "game",
+    "play"
+  ],
+  "author": "Hristo Spasov <hristo.b.spasov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/radito3/Think-a-bit/issues"
+  },
+  "homepage": "https://github.com/radito3/Think-a-bit#readme",
+  "dependencies": {
+    "form-urlencoded": "^2.0.4",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.2.2",
+    "style-loader": "^0.20.3",
+    "url-loader": "^1.0.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "progress-bar-webpack-plugin": "^1.11.0",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.11",
+    "webpack-dev-server": "^3.1.1"
+  }
+}

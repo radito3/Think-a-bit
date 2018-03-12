@@ -1,1 +1,3 @@
 target/
+node_modules/
+WEB-INF/views/bundle.js
