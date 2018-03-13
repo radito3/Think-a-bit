@@ -4,10 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.elsys.netprogramming</groupId>
+    <groupId>org.elsys.netprog</groupId>
     <artifactId>Think-a-bit</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
+
     <build>
         <plugins>
             <plugin>
@@ -28,6 +29,7 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -87,12 +89,11 @@
             <artifactId>hk2-utils</artifactId>
             <version>2.4.0-b10</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-mvc -->
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-mvc</artifactId>
             <version>2.23.2</version>
         </dependency>
-
     </dependencies>
+
 </project>
