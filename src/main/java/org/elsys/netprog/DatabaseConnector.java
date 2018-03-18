@@ -1,5 +1,15 @@
 package org.elsys.netprog;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+import org.hibernate.query.internal.QueryImpl;
+import org.hibernate.service.ServiceRegistry;
+
 import java.sql.*;
 
 public class DatabaseConnector {
@@ -7,9 +17,10 @@ public class DatabaseConnector {
     private static DatabaseConnector instance;
 
     private Connection connect = null;
-    private Statement statement = null;
+//    private Statement statement = null;
 //    private PreparedStatement preparedStatement = null;
 //    private ResultSet resultSet = null;
+    private SessionFactory factory;
 
     private static final String USER = System.getProperty("sqlUser");
     private static final String PASS = System.getProperty("sqlPass");
@@ -27,6 +38,13 @@ public class DatabaseConnector {
 
             connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/Think_a_bitDB", USER, PASS);
 
+            Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
+
+            ServiceRegistry registry = new StandardServiceRegistryBuilder()
+                    .applySettings(configuration.getProperties()).build();
+
+            factory = configuration.buildSessionFactory(registry);
+
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
@@ -34,7 +52,7 @@ public class DatabaseConnector {
 
     public String getInfo() throws SQLException {
 
-        statement = connect.createStatement();
+        Statement statement = connect.createStatement();
 
         try (ResultSet resultSet = statement.executeQuery("SELECT * FROM Users;")) {
 
@@ -43,6 +61,23 @@ public class DatabaseConnector {
             return resultSet.getString("UserName");
 
         }
+    }
+
+    public void test() {
+        Transaction transaction = null;
+
+        try (Session session = factory.withOptions().openSession()) {
+            transaction = session.beginTransaction();
+            //something
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+
     }
 
 //    private void insertData() throws Exception {

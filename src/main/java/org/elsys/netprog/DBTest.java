@@ -15,9 +15,6 @@ public class DBTest {
     public Response getDBInfo() {
         DatabaseConnector conn = DatabaseConnector.getInstance();
 
-//        String user = conn.getUser();
-//        String pass = conn.getPass();
-
         String val = "default";
 
         try {

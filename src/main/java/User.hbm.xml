@@ -1,0 +1,21 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name = "org.elsys.netprog.model.User" table = "Users">
+
+        <meta attribute = "class-description">
+            This class contains the user detail.
+        </meta>
+
+        <id name = "Id" type = "int" column = "Id">
+            <generator class="native"/>
+        </id>
+
+        <property name = "UserName" column = "UserName" type = "string"/>
+        <property name = "Password" column = "Password" type = "string"/>
+
+    </class>
+</hibernate-mapping>
