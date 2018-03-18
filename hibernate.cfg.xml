@@ -19,7 +19,7 @@
         </property>
 
         <property name = "hibernate.connection.username">
-            neprog
+            netprog
         </property>
 
         <property name = "hibernate.connection.password">
