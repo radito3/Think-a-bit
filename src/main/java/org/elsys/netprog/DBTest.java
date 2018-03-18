@@ -18,7 +18,7 @@ public class DBTest {
 //        String user = conn.getUser();
 //        String pass = conn.getPass();
 
-        String val = "1";
+        String val = "default";
 
         try {
             val = conn.getInfo();

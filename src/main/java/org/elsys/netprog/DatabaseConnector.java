@@ -25,31 +25,24 @@ public class DatabaseConnector {
         try {
             Class.forName("com.mysql.jdbc.Driver");
 
-            connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/Think-a-bit", USER, PASS);
+            connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/Think_a_bitDB", USER, PASS);
 
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public String getUser() {
-        return USER;
-    }
-
-    public String getPass() {
-        return PASS;
-    }
-
     public String getInfo() throws SQLException {
 
-        statement = connect.createStatement(); //blows up here
-
-        statement.executeQuery("USE DATABASE Think_a_bitDB");
+        statement = connect.createStatement();
 
         try (ResultSet resultSet = statement.executeQuery("SELECT * FROM Users;")) {
-            return resultSet.getString(1);
-        }
 
+            resultSet.first();
+
+            return resultSet.getString("UserName");
+
+        }
     }
 
 //    private void insertData() throws Exception {
