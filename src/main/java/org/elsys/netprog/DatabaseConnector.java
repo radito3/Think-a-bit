@@ -1,13 +1,10 @@
 package org.elsys.netprog;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Query;
-import org.hibernate.query.internal.QueryImpl;
 import org.hibernate.service.ServiceRegistry;
 
 import java.sql.*;
@@ -58,17 +55,19 @@ public class DatabaseConnector {
 
             resultSet.first();
 
-            return resultSet.getString("UserName");
+            return resultSet.getString("UserName") + ", " + resultSet.getString("Pass");
 
         }
     }
 
-    public void test() {
+    public void save(Object object) {
         Transaction transaction = null;
 
         try (Session session = factory.withOptions().openSession()) {
             transaction = session.beginTransaction();
-            //something
+
+            session.save(object);
+//            session.persist(object);
 
             transaction.commit();
         } catch (Exception e) {
