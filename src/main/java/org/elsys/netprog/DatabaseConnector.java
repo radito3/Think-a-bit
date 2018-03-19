@@ -1,5 +1,6 @@
 package org.elsys.netprog;
 
+import org.elsys.netprog.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -8,6 +9,8 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 import java.sql.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DatabaseConnector {
 
@@ -35,7 +38,9 @@ public class DatabaseConnector {
 
             connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/Think_a_bitDB", USER, PASS);
 
-            Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
+            Configuration configuration = new Configuration()
+                    .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(User.class);
 
             ServiceRegistry registry = new StandardServiceRegistryBuilder()
                     .applySettings(configuration.getProperties()).build();
@@ -47,15 +52,19 @@ public class DatabaseConnector {
         }
     }
 
-    public String getInfo() throws SQLException {
+    public String getUserInfo() throws SQLException {
 
         Statement statement = connect.createStatement();
 
         try (ResultSet resultSet = statement.executeQuery("SELECT * FROM Users;")) {
 
-            resultSet.first();
+            Set<String> results = new HashSet<>();
 
-            return resultSet.getString("UserName") + ", " + resultSet.getString("Pass");
+            while (resultSet.next()) {
+                results.add(resultSet.getString("UserName") + ", " + resultSet.getString("Pass"));
+            }
+
+            return results.toString();
 
         }
     }
@@ -63,11 +72,10 @@ public class DatabaseConnector {
     public void save(Object object) {
         Transaction transaction = null;
 
-        try (Session session = factory.withOptions().openSession()) {
+        try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
 
-            session.save(object);
-//            session.persist(object);
+            session.saveOrUpdate(object);
 
             transaction.commit();
         } catch (Exception e) {

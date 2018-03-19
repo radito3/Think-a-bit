@@ -1,16 +1,24 @@
 package org.elsys.netprog.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "Users", schema = "Think_a_bitDB")
+@Table(name = "Users")
 public class User implements Serializable {
 
+    @Id
+    @Column(columnDefinition = "mysql->int(11)", name = "Id", nullable = false, unique = true)
     private int Id;
+
+    @Column(columnDefinition = "mysql->varchar(64)", name = "UserName", nullable = false)
     private String UserName;
+
+    @Column(columnDefinition = "mysql->text", name = "Pass", nullable = false)
     private String Password;
+
+    @Transient //field with this annotation will not be stored in db
+    private User currentUser;
 
     public User() {}
 
@@ -45,5 +53,14 @@ public class User implements Serializable {
     public void setPassword(String password) {
         //check for string validation
         Password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "Id=" + Id +
+                ", UserName='" + UserName + '\'' +
+                ", Password='" + Password + '\'' +
+                '}';
     }
 }
