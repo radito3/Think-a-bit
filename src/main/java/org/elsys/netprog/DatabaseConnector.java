@@ -64,7 +64,7 @@ public class DatabaseConnector {
     public void save(Object object) {
         Transaction transaction = null;
 
-        try (Session session = factory.withOptions().openSession()) {
+        try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
 
             session.save(object);
