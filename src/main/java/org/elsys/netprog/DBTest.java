@@ -41,7 +41,7 @@ public class DBTest {
         SessionFactory factory = configuration.buildSessionFactory(registry);
 
         try {
-            val = conn.getUserInfo();
+            val = conn.getInfo();
 
             Session session = factory.openSession();
 
@@ -52,7 +52,7 @@ public class DBTest {
 
             transaction.commit();
 
-            val1 = conn.getUserInfo();
+            val1 = conn.getInfo();
 
 
 
