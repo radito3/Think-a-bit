@@ -1,7 +1,11 @@
 package org.elsys.netprog.model;
 
+import javax.persistence.Entity;
+
+@Entity
 public class User {
 
+    @javax.persistence.Id
     private int Id;
     private String UserName;
     private String Password;

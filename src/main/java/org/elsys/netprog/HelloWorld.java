@@ -1,29 +1,44 @@
 package org.elsys.netprog;
 
+import org.elsys.netprog.model.User;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.jersey.server.mvc.Template;
-import org.glassfish.jersey.server.mvc.Viewable;
-
-import java.util.HashMap;
-import java.util.Map;
-
 @Path("/test")
-@Template
-@Produces(MediaType.TEXT_HTML)
+//@Template
 public class HelloWorld {
 
     @GET
-    public Viewable getHelloWorld() {
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getHelloWorld() {
 
-        Map<String, String> test = new HashMap<>();
-        test.put("key", "val");
-        test.put("one", "two");
+        DatabaseConnector connector = DatabaseConnector.getInstance();
 
-        return new Viewable("index.jsp", test);
+        User user = new User();
+        user.setUserName("test");
+        user.setPassword("test");
+
+//
+//        Configuration cfg = new Configuration().configure("hibernate.cfg.xml");
+//
+//        SessionFactory sf = cfg.buildSessionFactory();
+//
+//        Session session = sf.openSession();
+//
+//        Transaction tx = session.beginTransaction();
+//
+//        session.save(user);
+//
+//        tx.commit();
+
+        connector.save(user);
+
+
+        return Response.ok().entity("string").build();
+//        return new Viewable("index.jsp", test);
     }
 }

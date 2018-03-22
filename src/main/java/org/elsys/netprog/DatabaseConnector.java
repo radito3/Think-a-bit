@@ -1,16 +1,14 @@
 package org.elsys.netprog;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Query;
-import org.hibernate.query.internal.QueryImpl;
-import org.hibernate.service.ServiceRegistry;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DatabaseConnector {
 
@@ -33,21 +31,21 @@ public class DatabaseConnector {
     }
 
     private DatabaseConnector() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-
-            connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/Think_a_bitDB", USER, PASS);
+//        try {
+//            Class.forName("com.mysql.jdbc.Driver");
+//
+//            connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/Think_a_bitDB", USER, PASS);
 
             Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
 
-            ServiceRegistry registry = new StandardServiceRegistryBuilder()
-                    .applySettings(configuration.getProperties()).build();
+//            ServiceRegistry registry = new StandardServiceRegistryBuilder()
+//                    .applySettings(configuration.getProperties()).build();
 
-            factory = configuration.buildSessionFactory(registry);
+            factory = configuration.buildSessionFactory(/*registry*/);
 
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+//        } catch (ClassNotFoundException | SQLException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public String getInfo() throws SQLException {
@@ -63,12 +61,13 @@ public class DatabaseConnector {
         }
     }
 
-    public void test() {
+    public void save(Object object) {
         Transaction transaction = null;
 
         try (Session session = factory.withOptions().openSession()) {
             transaction = session.beginTransaction();
-            //something
+
+            session.save(object);
 
             transaction.commit();
         } catch (Exception e) {
