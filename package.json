@@ -28,8 +28,10 @@
   "homepage": "https://github.com/radito3/Think-a-bit#readme",
   "dependencies": {
     "form-urlencoded": "^2.0.4",
+    "material-ui": "^0.20.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-helmet": "^5.2.0",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
