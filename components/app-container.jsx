@@ -54,6 +54,13 @@ class AppContainer extends React.Component {
             <Helmet><style>{`
                 body {
                     margin: 0;
+                    height: 100%;
+                }
+                body > div,
+                body > div > div,
+                body > div > div > div.container-fluid,
+                body > div > div > div.container-fluid > div {
+                    height: 100%;
                 }
             `}</style></Helmet>
             <AppBar
@@ -65,7 +72,6 @@ class AppContainer extends React.Component {
                 onLeftIconButtonClick={() => this.toggleDrawer()}
             />
             <Drawer
-                docked={false}
                 open={this.state.open}
                 containerStyle={{
                     "backgoundColor": "#A5D6A7"
