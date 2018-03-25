@@ -1,13 +1,23 @@
 package org.elsys.netprog.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
-public class User {
+@Table(name = "Users")
+public class User implements Serializable {
 
-    @javax.persistence.Id
+    @Id
+    @Column(columnDefinition = "mysql->int(11)", name = "Id", nullable = false, unique = true)
     private int Id;
+
+    @Column(columnDefinition = "mysql->varchar(64)", name = "UserName", nullable = false)
     private String UserName;
+
+    @Column(columnDefinition = "mysql->text", name = "Pass", nullable = false)
     private String Password;
 
     public User() {}

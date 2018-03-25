@@ -1,5 +1,6 @@
 package org.elsys.netprog;
 
+import org.elsys.netprog.db.DatabaseConnector;
 import org.elsys.netprog.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -40,8 +41,12 @@ public class DBTest {
 
         SessionFactory factory = configuration.buildSessionFactory(registry);
 
-        try {
-            val = conn.getInfo();
+
+        User user1 = conn.proccessObject(null, (Session s) -> s.get(User.class, 1));
+
+
+//        try {
+//            val = conn.getInfo();
 
             Session session = factory.openSession();
 
@@ -52,13 +57,13 @@ public class DBTest {
 
             transaction.commit();
 
-            val1 = conn.getInfo();
+//            val1 = conn.getInfo();
 
 
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
         return Response.ok().entity("first check: " + val + "\nsecond check: " + val1).build();
     }

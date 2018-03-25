@@ -1,6 +1,8 @@
 package org.elsys.netprog;
 
+import org.elsys.netprog.db.DatabaseConnector;
 import org.elsys.netprog.model.User;
+import org.hibernate.Session;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,7 +37,7 @@ public class HelloWorld {
 //
 //        tx.commit();
 
-        connector.save(user);
+        connector.proccessObject((Session s) -> s.save(user));
 
 
         return Response.ok().entity("string").build();
