@@ -12,8 +12,6 @@
             com.mysql.jdbc.Driver
         </property>
 
-        <!-- Assume test is the database name -->
-
         <property name = "hibernate.connection.url">
             jdbc:mysql://localhost:3306/Think_a_bitDB
         </property>
@@ -31,6 +29,8 @@
         <!-- List of XML mapping files -->
         <mapping resource = "User.hbm.xml"/>
         <mapping resource = "Questions.hbm.xml"/>
+        <mapping resource = "Categories.hbm.xml"/>
+        <mapping resource = "QuestionCategories.hbm.xml"/>
 
     </session-factory>
 </hibernate-configuration>

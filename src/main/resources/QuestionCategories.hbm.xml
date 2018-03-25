@@ -1,0 +1,19 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name = "org.elsys.netprog.model.QuestionCategories" table = "QuestionCategories">
+
+        <meta attribute = "class-description">
+            This class contains the question and category tables relation.
+        </meta>
+
+        <composite-id>
+            <key-property name="QuestionId" type = "int" column="QuestionId"  />
+            <key-property name = "CategoryId" type = "int" column = "CategoryId" />
+        </composite-id>
+
+    </class>
+</hibernate-mapping>
