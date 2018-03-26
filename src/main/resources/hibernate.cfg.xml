@@ -24,13 +24,18 @@
             Think-a-bit2018
         </property>
 
-        <property name = "hbm2ddl.auto">create</property>
+        <property name = "hbm2ddl.auto">
+            update
+        </property>
 
         <!-- List of XML mapping files -->
         <mapping resource = "User.hbm.xml"/>
         <mapping resource = "Questions.hbm.xml"/>
         <mapping resource = "Categories.hbm.xml"/>
         <mapping resource = "QuestionCategories.hbm.xml"/>
+        <mapping resource = "UserProgress.hbm.xml"/>
+        <mapping resource = "Stages.hbm.xml"/>
+        <mapping resource = "StageAttempts.hbm.xml"/>
 
     </session-factory>
 </hibernate-configuration>

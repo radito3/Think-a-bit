@@ -4,18 +4,17 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name = "org.elsys.netprog.model.Question" table = "Question">
+    <class name = "org.elsys.netprog.model.Stages" table = "Stages">
 
         <meta attribute = "class-description">
-            This class contains the question detail.
+            This class contains the stages detail.
         </meta>
 
         <id name = "Id" type = "int" column = "Id">
             <generator class = "native"/>
         </id>
 
-        <property name = "Type" column = "Type" type = "string"/>
-        <property name = "Title" column = "Title" type = "string"/>
+        <property name = "CategoryId" column = "CategoryId" type = "int"/>
 
     </class>
 </hibernate-mapping>

@@ -4,16 +4,18 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name = "org.elsys.netprog.model.QuestionCategories" table = "QuestionCategories">
+    <class name = "org.elsys.netprog.model.UserProgress" table = "UserProgress">
 
         <meta attribute = "class-description">
-            This class contains the question and category tables relation.
+            This class contains the progress of a stage for the user.
         </meta>
 
         <composite-id>
-            <key-property name = "QuestionId" type = "int" column = "QuestionId" />
+            <key-property name = "UserId" type = "int" column = "UserId" />
             <key-property name = "CategoryId" type = "int" column = "CategoryId" />
         </composite-id>
+
+        <property name = "reachedStage" type = "int" column = "ReachedStage" />
 
     </class>
 </hibernate-mapping>

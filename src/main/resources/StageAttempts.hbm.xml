@@ -4,16 +4,18 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name = "org.elsys.netprog.model.QuestionCategories" table = "QuestionCategories">
+    <class name = "org.elsys.netprog.model.StageAttempts" table = "StageAttempts">
 
         <meta attribute = "class-description">
-            This class contains the question and category tables relation.
+            This class contains the number of attempts for a stage for a user.
         </meta>
 
         <composite-id>
-            <key-property name = "QuestionId" type = "int" column = "QuestionId" />
             <key-property name = "CategoryId" type = "int" column = "CategoryId" />
+            <key-property name = "StageId" type = "int" column = "StageId" />
         </composite-id>
+
+        <property name = "Attempts" type = "int" column = "Attempts" />
 
     </class>
 </hibernate-mapping>
