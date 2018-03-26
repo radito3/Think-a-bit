@@ -37,14 +37,23 @@ public class DatabaseConnector implements Connection {
     }
 
     @Override
-    public <T> T proccessObject(Consumer<Session> consumer, Function<Session, T>... functions) {
+    public void processObject(Consumer<Session> consumer) {
+        processObject(consumer, null);
+    }
+
+    @Override
+    public <T> T getObject(Function<Session, T> function) {
+        return processObject(null, function);
+    }
+
+    private <T> T processObject(Consumer<Session> consumer, Function<Session, T> function) {
         Transaction transaction = null;
 
         try (Session session = factory.openSession()) {
             transaction = session.beginTransaction();
 
-            if (functions.length != 0) {
-                return functions[0].apply(session);
+            if (function != null) {
+                return function.apply(session);
             }
             consumer.accept(session);
 

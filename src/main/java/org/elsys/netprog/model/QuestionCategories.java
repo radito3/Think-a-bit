@@ -4,10 +4,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "QuestionCategories")
-public class QuestionCategories {
+public class QuestionCategories implements Serializable {
 
     @Id
     @Column(columnDefinition = "mysql->int(11)", name = "QuestionId", nullable = false)

@@ -20,7 +20,7 @@ public class Question implements Serializable {
     @Column(columnDefinition = "mysql->enum('placeholder', 'placeholder1')", name = "Title", nullable = false)
     private Type Type;
 
-    @Column(columnDefinition = "mysql->text", name = "Title", nullable = false)
+    @Column(columnDefinition = "mysql->text", name = "Title", nullable = false, insertable = false, updatable = false)
     private String Title;
 
     public Question() {}

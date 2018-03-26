@@ -54,4 +54,13 @@ public class User implements Serializable {
         //check for string validation
         Password = password;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "Id=" + Id +
+                ", UserName='" + UserName + '\'' +
+                ", Password='" + Password + '\'' +
+                '}';
+    }
 }

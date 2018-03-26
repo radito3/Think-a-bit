@@ -37,7 +37,7 @@ public class HelloWorld {
 //
 //        tx.commit();
 
-        connector.proccessObject((Session s) -> s.save(user));
+        connector.processObject((Session s) -> s.save(user));
 
 
         return Response.ok().entity("string").build();

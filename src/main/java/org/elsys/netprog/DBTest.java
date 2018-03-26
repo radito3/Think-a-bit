@@ -1,6 +1,9 @@
 package org.elsys.netprog;
 
 import org.elsys.netprog.db.DatabaseConnector;
+import org.elsys.netprog.model.Categories;
+import org.elsys.netprog.model.Question;
+import org.elsys.netprog.model.QuestionCategories;
 import org.elsys.netprog.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,7 +17,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
 
 @Path("/dbtest")
 public class DBTest {
@@ -22,7 +24,7 @@ public class DBTest {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getDBInfo() {
-        DatabaseConnector conn = DatabaseConnector.getInstance();
+//        DatabaseConnector conn = DatabaseConnector.getInstance();
 
         String val = "default";
         String val1 = "default";
@@ -34,7 +36,10 @@ public class DBTest {
 
         Configuration configuration = new Configuration()
                 .configure("hibernate.cfg.xml")
-                .addAnnotatedClass(User.class);
+                .addAnnotatedClass(User.class)
+                .addAnnotatedClass(Question.class)
+                .addAnnotatedClass(Categories.class)
+                .addAnnotatedClass(QuestionCategories.class);
 
         ServiceRegistry registry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
@@ -42,8 +47,9 @@ public class DBTest {
         SessionFactory factory = configuration.buildSessionFactory(registry);
 
 
-        User user1 = conn.proccessObject(null, (Session s) -> s.get(User.class, 1));
+//        User user1 = conn.getObject((Session s) -> s.get(User.class, 1));
 
+//        conn.proccessObject((Session s) -> s.save(user1));
 
 //        try {
 //            val = conn.getInfo();
@@ -72,23 +78,36 @@ public class DBTest {
     @Path("/1")
     @Produces(MediaType.TEXT_PLAIN)
     public Response getUser() {
-        Configuration configuration = new Configuration()
-                .configure("hibernate.cfg.xml")
-                .addAnnotatedClass(User.class);
+//        Configuration configuration = new Configuration()
+//                .configure("hibernate.cfg.xml")
+//                .addAnnotatedClass(User.class)
+//                .addAnnotatedClass(Question.class)
+//                .addAnnotatedClass(Categories.class)
+//                .addAnnotatedClass(QuestionCategories.class);
+//
+//        ServiceRegistry registry = new StandardServiceRegistryBuilder()
+//                .applySettings(configuration.getProperties()).build();
+//
+//        SessionFactory factory = configuration.buildSessionFactory(registry);
+//
+//        Session session = factory.openSession();
+//
+//        Transaction transaction = session.beginTransaction();
 
-        ServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .applySettings(configuration.getProperties()).build();
+        User user = DatabaseConnector.getInstance().getObject(s -> s.get(User.class, 2));//session.get(User.class, 2);
 
-        SessionFactory factory = configuration.buildSessionFactory(registry);
-
-        Session session = factory.openSession();
-
-        Transaction transaction = session.beginTransaction();
-
-        User user = session.get(User.class, 1);
-
-        transaction.commit();
+//        transaction.commit();
 
         return Response.ok().entity(user.toString()).build();
     }
+
+    @GET
+    @Path("/2")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response insertUser() {
+        DatabaseConnector.getInstance()
+                .processObject(s -> s.save(new User(3, "three", "three")));
+        return Response.status(200).entity("nice try").build();
+    }
+
 }
