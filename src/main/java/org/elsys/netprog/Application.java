@@ -22,7 +22,7 @@ public class Application extends ResourceConfig {
 
         property(ServerProperties.TRACING, TracingConfig.ON_DEMAND.name());
 
-        property(JspMvcFeature.TEMPLATE_BASE_PATH, "WEB-INF/views");
+        property(JspMvcFeature.TEMPLATE_BASE_PATH, "WEB-INF/views/index.jsp");
 
 //        this.register(MvcFeature.class);
 //        this.property(MvcFeature.TEMPLATE_BASE_PATH, "WEB-INF/views");

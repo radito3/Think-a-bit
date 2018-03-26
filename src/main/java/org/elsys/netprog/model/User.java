@@ -55,12 +55,4 @@ public class User implements Serializable {
         Password = password;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "Id=" + Id +
-                ", UserName='" + UserName + '\'' +
-                ", Password='" + Password + '\'' +
-                '}';
-    }
 }

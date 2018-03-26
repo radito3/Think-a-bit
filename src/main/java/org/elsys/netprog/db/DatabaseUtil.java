@@ -7,12 +7,22 @@ import org.hibernate.Transaction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Class for managing the Database connection and operations with the DB.
+ *
+ * @author Rangel Ivanov
+ */
 public class DatabaseUtil implements Connector {
 
     private static DatabaseUtil instance;
 
     private SessionFactory factory;
 
+    /**
+     * Get the Singleton instance.
+     *
+     * @return The instance
+     */
     public static DatabaseUtil getInstance() {
         if (instance == null) {
             instance = new DatabaseUtil();
@@ -24,11 +34,24 @@ public class DatabaseUtil implements Connector {
         factory = Connector.connect();
     }
 
+
+    /**
+     * Save, Update or Delete an object to the Database.
+     *
+     * @param consumer The lambda expression with the needed operation
+     */
     @Override
     public void processObject(Consumer<Session> consumer) {
         processObject(consumer, null);
     }
 
+    /**
+     * Get an object from the Database.
+     *
+     * @param function The lambda expression with the operation needed
+     * @param <T> The object needed
+     * @return The wanted object
+     */
     @Override
     public <T> T getObject(Function<Session, T> function) {
         return processObject(null, function);

@@ -1,9 +1,6 @@
 package org.elsys.netprog.db;
 
-import org.elsys.netprog.model.Categories;
-import org.elsys.netprog.model.Question;
-import org.elsys.netprog.model.QuestionCategories;
-import org.elsys.netprog.model.User;
+import org.elsys.netprog.model.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -27,7 +24,11 @@ public interface Connector {
                 .addAnnotatedClass(User.class)
                 .addAnnotatedClass(Question.class)
                 .addAnnotatedClass(Categories.class)
-                .addAnnotatedClass(QuestionCategories.class);
+                .addAnnotatedClass(QuestionCategories.class)
+                .addAnnotatedClass(Answers.class)
+                .addAnnotatedClass(StageAttempts.class)
+                .addAnnotatedClass(Stages.class)
+                .addAnnotatedClass(UserProgress.class);
 
         ServiceRegistry registry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();

@@ -14,13 +14,22 @@ public class Answers implements Serializable {
     @Column(columnDefinition = "mysql->int(11)", name = "Id", nullable = false, unique = true)
     private int Id;
 
+    @Column(columnDefinition = "mysql->int(11)", name = "QuestionId", nullable = false)
     private int QuestionId;
 
+    @Column(columnDefinition = "mysql->text", name = "Payload", nullable = false)
     private String Payload;
 
-    private boolean IsCorrect;
+    @Column(columnDefinition = "mysql->boolean", name = "IsCorrect", nullable = false)
+    private boolean IsCorrect = false;
 
     public Answers() {}
+
+    public Answers(int id, int questionId, String payload) {
+        this.Id = id;
+        this.QuestionId = questionId;
+        this.Payload = payload;
+    }
 
     public int getId() {
         return Id;
