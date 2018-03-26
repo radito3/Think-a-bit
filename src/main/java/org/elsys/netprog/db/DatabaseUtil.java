@@ -3,37 +3,25 @@ package org.elsys.netprog.db;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class DatabaseConnector implements Connection {
+public class DatabaseUtil implements Connector {
 
-    private static DatabaseConnector instance;
+    private static DatabaseUtil instance;
 
     private SessionFactory factory;
 
-//    private static final String USER = System.getProperty("sqlUser");
-//    private static final String PASS = System.getProperty("sqlPass");
-
-    public static DatabaseConnector getInstance() {
+    public static DatabaseUtil getInstance() {
         if (instance == null) {
-            instance = new DatabaseConnector();
+            instance = new DatabaseUtil();
         }
         return instance;
     }
 
-    private DatabaseConnector() {
-//        try {
-//            Class.forName("com.mysql.jdbc.Driver");
-//
-//            connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/Think_a_bitDB", USER, PASS);
-
-//        } catch (ClassNotFoundException | SQLException e) {
-//            e.printStackTrace();
-//        }
-        factory = Connection.connect();
+    private DatabaseUtil() {
+        factory = Connector.connect();
     }
 
     @Override

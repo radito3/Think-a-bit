@@ -13,7 +13,7 @@ import org.hibernate.service.ServiceRegistry;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface Connection {
+public interface Connector {
 
     /**
      * Builds  the {@link org.hibernate.SessionFactory} with the metadata from

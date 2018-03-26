@@ -1,6 +1,6 @@
 package org.elsys.netprog;
 
-import org.elsys.netprog.db.DatabaseConnector;
+import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.User;
 import org.hibernate.Session;
 
@@ -11,14 +11,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/test")
-//@Template
 public class HelloWorld {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getHelloWorld() {
 
-        DatabaseConnector connector = DatabaseConnector.getInstance();
+        DatabaseUtil connector = DatabaseUtil.getInstance();
 
         User user = new User();
         user.setUserName("test");
@@ -41,6 +40,5 @@ public class HelloWorld {
 
 
         return Response.ok().entity("string").build();
-//        return new Viewable("index.jsp", test);
     }
 }

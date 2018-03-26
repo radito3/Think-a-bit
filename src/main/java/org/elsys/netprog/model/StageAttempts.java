@@ -15,6 +15,9 @@ public class StageAttempts implements Serializable {
     private int StageId;
 
     @Id
+    @Column(columnDefinition = "mysql->int(11)", name = "UserId", nullable = false)
+    private int UserId;
+
     @Column(columnDefinition = "mysql->int(11)", name = "CategoryId", nullable = false)
     private int CategoryId;
 
@@ -23,10 +26,19 @@ public class StageAttempts implements Serializable {
 
     public StageAttempts() {}
 
-    public StageAttempts(int stageId, int categoryId, int attempts) {
+    public StageAttempts(int stageId, int userId, int categoryId, int attempts) {
         this.StageId = stageId;
+        this.UserId = userId;
         this.CategoryId = categoryId;
         this.Attempts = attempts;
+    }
+
+    public int getUserId() {
+        return UserId;
+    }
+
+    public void setUserId(int userId) {
+        UserId = userId;
     }
 
     public int getStageId() {

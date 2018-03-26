@@ -17,7 +17,7 @@ public class Question implements Serializable {
     private int Id;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "mysql->enum('placeholder', 'placeholder1')", name = "Title", nullable = false)
+    @Column(columnDefinition = "mysql->enum('CLOSED_ONE', 'CLOSED_MANY', 'OPEN')", name = "Title", nullable = false)
     private Type Type;
 
     @Column(columnDefinition = "mysql->text", name = "Title", nullable = false, insertable = false, updatable = false)
@@ -32,7 +32,7 @@ public class Question implements Serializable {
     }
 
     private enum Type {
-        PLACEHOLDER, PLACEHOLDER1
+        CLOSED_ONE, CLOSED_MANY, OPEN
     }
 
     public int getId() {
