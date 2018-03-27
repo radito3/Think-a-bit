@@ -26,4 +26,8 @@ public class UserManagement {
         db.processObject(s -> s.save(user));
     }
 
+    public void logout() {
+        System.clearProperty("currentUserId");
+    }
+
 }
