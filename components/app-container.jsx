@@ -1,5 +1,6 @@
 import React from "react";
 import Helmet from "react-helmet";
+import { connect } from "react-redux";
 import { Route, Switch, withRouter } from "react-router-dom";
 import {
     AppBar,
@@ -15,6 +16,7 @@ import RegisterPage from "./register-page.jsx";
 import CategoriesPage from "./categories-page.jsx";
 import StagesPage from "./stages-page.jsx";
 import QuestionPage from "./question-page.jsx";
+import { logout } from "../store/actions/authentication";
 
 class AppContainer extends React.Component {
     constructor(props) {
@@ -34,22 +36,32 @@ class AppContainer extends React.Component {
     }
 
     render() {
-        const authentication = <div>
+        const appBarButtonStyle = {
+            color: "#FAFAFA"
+        };
+
+        const notAuthenticated = <div>
             <FlatButton
                 label="Log in"
                 onClick={() => this.props.history.push("/login")}
-                style={{
-                    color: "#FAFAFA"
-                }}
+                style={appBarButtonStyle}
             />
             <FlatButton
                 label="Register"
                 onClick={() => this.props.history.push("/register")}
-                style={{
-                    color: "#FAFAFA"
-                }}
+                style={appBarButtonStyle}
             />
         </div>;
+
+        const authenticated = <div>
+            <p>{this.props.authentication.username}</p>
+            <FlatButton
+                label="Log out"
+                onClick={() => this.props.logout()}
+                style={appBarButtonStyle}
+            />
+        </div>;
+
         return <div>
             <Helmet><style>{`
                 body {
@@ -68,7 +80,7 @@ class AppContainer extends React.Component {
                 style={{
                     "backgroundColor": "#A1887F"
                 }}
-                iconElementRight={authentication}
+                iconElementRight={this.props.authentication.username ? authenticated : notAuthenticated}
                 onLeftIconButtonClick={() => this.toggleDrawer()}
             />
             <Drawer
@@ -100,4 +112,8 @@ class AppContainer extends React.Component {
     }
 }
 
-export default withRouter(AppContainer);
+export default withRouter(connect(store => {
+    return {
+        authentication: store.authentication
+    };
+}, { logout })(AppContainer));
