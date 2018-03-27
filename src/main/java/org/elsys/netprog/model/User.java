@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "Users")
@@ -55,4 +56,27 @@ public class User implements Serializable {
         Password = password;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return Id == user.Id &&
+                Objects.equals(UserName, user.UserName) &&
+                Objects.equals(Password, user.Password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id, UserName, Password);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "Id=" + Id +
+                ", UserName='" + UserName + '\'' +
+                ", Password='" + Password + '\'' +
+                '}';
+    }
 }

@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "QuestionCategories")
@@ -23,6 +24,20 @@ public class QuestionCategories implements Serializable {
     public QuestionCategories(int Id1, int Id2) {
         this.QuestionId = Id1;
         this.CategoryId = Id2;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        QuestionCategories that = (QuestionCategories) object;
+        return QuestionId == that.QuestionId &&
+                CategoryId == that.CategoryId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(QuestionId, CategoryId);
     }
 
     public int getQuestionId() {

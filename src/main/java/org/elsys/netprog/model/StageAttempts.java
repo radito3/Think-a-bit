@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "StageAttempts")
@@ -31,6 +32,22 @@ public class StageAttempts implements Serializable {
         this.UserId = userId;
         this.CategoryId = categoryId;
         this.Attempts = attempts;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        StageAttempts that = (StageAttempts) object;
+        return StageId == that.StageId &&
+                UserId == that.UserId &&
+                CategoryId == that.CategoryId &&
+                Attempts == that.Attempts;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(StageId, UserId, CategoryId, Attempts);
     }
 
     public int getUserId() {

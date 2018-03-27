@@ -1,8 +1,8 @@
 package org.elsys.netprog;
 
 import org.elsys.netprog.db.DatabaseUtil;
+import org.elsys.netprog.game.UserManagement;
 import org.elsys.netprog.model.User;
-import org.hibernate.Session;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,28 +17,14 @@ public class HelloWorld {
     @Produces(MediaType.TEXT_PLAIN)
     public Response getHelloWorld() {
 
-        DatabaseUtil connector = DatabaseUtil.getInstance();
+        DatabaseUtil db = DatabaseUtil.getInstance();
 
-        User user = new User();
-        user.setUserName("test");
-        user.setPassword("test");
+//        User u = UserManagement.login("test", "test");
 
-//
-//        Configuration cfg = new Configuration().configure("hibernate.cfg.xml");
-//
-//        SessionFactory sf = cfg.buildSessionFactory();
-//
-//        Session session = sf.openSession();
-//
-//        Transaction tx = session.beginTransaction();
-//
-//        session.save(user);
-//
-//        tx.commit();
+        UserManagement userManagement = new UserManagement();
 
-        connector.processObject((Session s) -> s.save(user));
+        userManagement.register(new User(2, "two", "two"));
 
-
-        return Response.ok().entity("string").build();
+        return Response.ok().entity(db.getObject(s -> s.get(User.class, 2)).toString()).build();
     }
 }
