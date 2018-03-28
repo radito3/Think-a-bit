@@ -31,7 +31,7 @@ public class Question implements Serializable {
         this.Title = Title;
     }
 
-    private enum Type {
+    public enum Type {
         CLOSED_ONE, CLOSED_MANY, OPEN
     }
 

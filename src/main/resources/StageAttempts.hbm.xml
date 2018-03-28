@@ -13,9 +13,9 @@
         <composite-id>
             <key-property name = "UserId" type = "int" column = "UserId" />
             <key-property name = "StageId" type = "int" column = "StageId" />
+            <key-property name = "CategoryId" type = "int" column = "CategoryId" />
         </composite-id>
 
-        <property name = "CategoryId" type = "int" column = "CategoryId" />
         <property name = "Attempts" type = "int" column = "Attempts" />
 
     </class>

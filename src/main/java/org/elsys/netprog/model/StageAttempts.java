@@ -19,6 +19,7 @@ public class StageAttempts implements Serializable {
     @Column(columnDefinition = "mysql->int(11)", name = "UserId", nullable = false)
     private int UserId;
 
+    @Id
     @Column(columnDefinition = "mysql->int(11)", name = "CategoryId", nullable = false)
     private int CategoryId;
 

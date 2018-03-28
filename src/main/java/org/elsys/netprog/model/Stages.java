@@ -1,9 +1,6 @@
 package org.elsys.netprog.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -16,6 +13,9 @@ public class Stages implements Serializable {
 
     @Column(columnDefinition = "mysql->int(11)", name = "CategoryId", nullable = false)
     private int CategoryId;
+
+    @Transient
+    private boolean isUnlocked = false;
 
     public Stages() {}
 
@@ -40,4 +40,11 @@ public class Stages implements Serializable {
         CategoryId = categoryId;
     }
 
+    public boolean isUnlocked() {
+        return isUnlocked;
+    }
+
+    public void setUnlocked(boolean unlocked) {
+        isUnlocked = unlocked;
+    }
 }

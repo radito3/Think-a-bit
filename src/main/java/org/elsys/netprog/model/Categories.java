@@ -2,6 +2,7 @@ package org.elsys.netprog.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "Categories")
@@ -13,6 +14,9 @@ public class Categories implements Serializable {
 
     @Column(columnDefinition = "mysql->varchar(32)", name = "Name", nullable = false)
     private String Name;
+
+    @Transient
+    private List<Stages> stages;
 
     public Categories() {}
 
@@ -35,5 +39,13 @@ public class Categories implements Serializable {
 
     public void setName(String name) {
         Name = name;
+    }
+
+    public List<Stages> getStages() {
+        return stages;
+    }
+
+    public void setStages(List<Stages> stages) {
+        this.stages = stages;
     }
 }

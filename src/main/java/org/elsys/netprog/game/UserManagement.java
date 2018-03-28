@@ -1,33 +1,32 @@
 package org.elsys.netprog.game;
 
-import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.User;
 
-public class UserManagement {
-
-    private DatabaseUtil db;
+public class UserManagement extends AbstractGame implements UserOperations {
 
     public UserManagement() {
-//        System.setProperty("key", "val");
-        db = DatabaseUtil.getInstance();
+        super();
     }
 
+    @Override
     public User login(String userName, String passWord) {
         User u = (User) db.getObject(s ->
                 s.createQuery("FROM User WHERE UserName = '" + userName +
                         "' AND Password = '" + passWord + "'").uniqueResult());
 
-        System.setProperty("currentUserId", String.valueOf(u.getId()));
+        currrentUser = u;
 
         return u;
     }
 
+    @Override
     public void register(User user) {
         db.processObject(s -> s.save(user));
     }
 
+    @Override
     public void logout() {
-        System.clearProperty("currentUserId");
+        currrentUser = null;
     }
 
 }
