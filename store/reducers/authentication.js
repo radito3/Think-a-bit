@@ -4,7 +4,7 @@ const reducer = (state = { username: "" }, action) => {
             return {
                 ...state,
                 username: action.payload.username
-            }
+            };
         case "LOGOUT":
             return {
                 ...state,
@@ -12,6 +12,6 @@ const reducer = (state = { username: "" }, action) => {
             };
     }
     return state;
-}
+};
 
 export default reducer;
