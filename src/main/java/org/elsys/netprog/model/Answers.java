@@ -25,10 +25,11 @@ public class Answers implements Serializable {
 
     public Answers() {}
 
-    public Answers(int id, int questionId, String payload) {
+    public Answers(int id, int questionId, String payload, boolean isCorrect) {
         this.Id = id;
         this.QuestionId = questionId;
         this.Payload = payload;
+        this.IsCorrect = isCorrect;
     }
 
     public int getId() {

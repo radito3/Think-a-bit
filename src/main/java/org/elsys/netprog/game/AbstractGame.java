@@ -8,7 +8,7 @@ import org.elsys.netprog.model.User;
 
 import java.util.List;
 
-public abstract class AbstractGame implements Game {
+public abstract class AbstractGame {
 
     /**всички нужни променливи за играта*/
 
@@ -16,34 +16,30 @@ public abstract class AbstractGame implements Game {
 
     protected final DatabaseUtil db;
 
-    protected Categories currentCategory;
+    Categories currentCategory;
 
-    protected Question currentQuestion;
+    Question currentQuestion;
 
-    protected User currrentUser;
+    User currrentUser;
 
-    protected Stages currentStage;
+    Stages currentStage;
 
-    protected AbstractGame() {
+    AbstractGame() {
         db = DatabaseUtil.getInstance();
     }
 
-    @Override
     public Categories getCurrentCategory() {
         return currentCategory;
     }
 
-    @Override
     public Question getCurrentQuestion() {
         return currentQuestion;
     }
 
-    @Override
     public User getCurrrentUser() {
         return currrentUser;
     }
 
-    @Override
     public Stages getCurrentStage() {
         return currentStage;
     }
