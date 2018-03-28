@@ -34,12 +34,14 @@ class RegisterPage extends React.Component {
                             type="username"
                             onChange={(event, newValue) => this.setState({ username: newValue })}
                         />
+                        <br />
                         <TextField
                             hintText="Password Field"
                             floatingLabelText="Password"
                             type="password"
                             onChange={(event, newValue) => this.setState({ password: newValue })}
                         />
+                        <br />
                         <RaisedButton
                             label="Register"
                             labelPosition="before"

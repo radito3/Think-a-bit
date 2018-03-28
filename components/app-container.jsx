@@ -7,7 +7,8 @@ import {
     Drawer,
     MenuItem,
     FlatButton,
-    IconButton
+    IconButton,
+    Subheader
 } from "material-ui";
 import NavigationClose from "material-ui/svg-icons/navigation/close";
 import IndexPage from "./index-page.jsx";
@@ -40,27 +41,36 @@ class AppContainer extends React.Component {
             color: "#FAFAFA"
         };
 
-        const notAuthenticated = <div>
-            <FlatButton
-                label="Log in"
-                onClick={() => this.props.history.push("/login")}
-                style={appBarButtonStyle}
-            />
-            <FlatButton
-                label="Register"
-                onClick={() => this.props.history.push("/register")}
-                style={appBarButtonStyle}
-            />
-        </div>;
+        const authentication = this.props.authentication.username ?
+            <div>
+                <FlatButton
+                    label={this.props.authentication.username}
+                    onClick={() => { }}
+                    style={appBarButtonStyle}
+                />
+                <FlatButton
+                    label="Log out"
+                    onClick={() => this.props.logout()}
+                    style={appBarButtonStyle}
+                />
+            </div> :
+            <div>
+                <FlatButton
+                    label="Log in"
+                    onClick={() => this.props.history.push("/login")}
+                    style={appBarButtonStyle}
+                />
+                <FlatButton
+                    label="Register"
+                    onClick={() => this.props.history.push("/register")}
+                    style={appBarButtonStyle}
+                />
+            </div>;
 
-        const authenticated = <div>
-            <p>{this.props.authentication.username}</p>
-            <FlatButton
-                label="Log out"
-                onClick={() => this.props.logout()}
-                style={appBarButtonStyle}
-            />
-        </div>;
+        const drawer = this.props.authentication.username ?
+            <Subheader>{this.props.authentication.username}</Subheader> :
+            <div><MenuItem onClick={() => this.props.history.push("/login")}>Log in</MenuItem>
+            <MenuItem onClick={() => this.props.history.push("/register")}>Register</MenuItem></div>;
 
         return <div>
             <Helmet><style>{`
@@ -80,7 +90,7 @@ class AppContainer extends React.Component {
                 style={{
                     "backgroundColor": "#A1887F"
                 }}
-                iconElementRight={this.props.authentication.username ? authenticated : notAuthenticated}
+                iconElementRight={authentication}
                 onLeftIconButtonClick={() => this.toggleDrawer()}
             />
             <Drawer
@@ -97,8 +107,7 @@ class AppContainer extends React.Component {
                     iconElementLeft={<IconButton><NavigationClose /></IconButton>}
                     onLeftIconButtonClick={() => this.toggleDrawer()}
                 />
-                <MenuItem onClick={() => this.props.history.push("/login")}>Log in</MenuItem>
-                <MenuItem onClick={() => this.props.history.push("/register")}>Register</MenuItem>
+                {drawer}
             </Drawer>
             <Switch>
                 <Route path="/" exact component={IndexPage} />
