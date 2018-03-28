@@ -77,6 +77,9 @@ class AppContainer extends React.Component {
                 <Subheader style={{
                     "fontSize": "30px"
                 }}>Play a game:</Subheader>
+                {this.props.categories.map(category =>
+                    <MenuItem key={category}>{category}</MenuItem>
+                )}
             </div> :
             <div>
                 <MenuItem onClick={() => this.props.history.push("/login")}>Log in</MenuItem>
@@ -141,6 +144,7 @@ class AppContainer extends React.Component {
 
 export default withRouter(connect(store => {
     return {
-        authentication: store.authentication
+        authentication: store.authentication,
+        categories: store.categories.categories
     };
 }, { logout })(AppContainer));
