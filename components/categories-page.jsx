@@ -1,9 +1,31 @@
 import React from "react";
+import { Redirect, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
 import { GridList, RaisedButton } from "material-ui";
 import StarBorder from "material-ui/svg-icons/toggle/star-border";
+import { addCategories, removeCategories } from "../store/actions/categories";
 
 class CategoriesPage extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.props.addCategories([
+            "Biology",
+            "Literature",
+            "History",
+            "Maths",
+            "Astronomy",
+            "Geography",
+            "Programming",
+            "All"
+        ]);
+    }
+
     render() {
+        if (!this.props.authentication.username) {
+            return <Redirect to="/login" />;
+        }
+
         const styles = {
             root: {
                 display: 'flex',
@@ -17,44 +39,6 @@ class CategoriesPage extends React.Component {
             }
         };
 
-        const tilesData = [
-            {
-                img: 'images/grid-list/00-52-29-429_640.jpg',
-                title: 'Breakfast',
-                author: 'jill111',
-            },
-            {
-                img: 'images/grid-list/burger-827309_640.jpg',
-                title: 'Tasty burger',
-                author: 'pashminu',
-            },
-            {
-                img: 'images/grid-list/camera-813814_640.jpg',
-                title: 'Camera',
-                author: 'Danson67',
-            },
-            {
-                img: 'images/grid-list/morning-819362_640.jpg',
-                title: 'Morning',
-                author: 'fancycrave1',
-            },
-            {
-                img: 'images/grid-list/hats-829509_640.jpg',
-                title: 'Hats',
-                author: 'Hans',
-            },
-            {
-                img: 'images/grid-list/honey-823614_640.jpg',
-                title: 'Honey',
-                author: 'fancycravel',
-            },
-            {
-                img: 'images/grid-list/vegetables-790022_640.jpg',
-                title: 'Vegetables',
-                author: 'jill111',
-            }
-        ];
-
         return <div style={styles.root}>
             <GridList
                 cellHeight={180}
@@ -62,9 +46,9 @@ class CategoriesPage extends React.Component {
                 cols={4}
                 padding={8}
             >
-                {tilesData.map((tile) => (
+                {this.props.categories.map(category => (
                     <RaisedButton
-                    key={tile.img}
+                    key={category}
                         buttonStyle={{
                             "fontSize": "20px",
                             "textAlign": "center",
@@ -74,7 +58,7 @@ class CategoriesPage extends React.Component {
                             "height": "100%",
                             "width": "100%"
                         }}
-                    >{tile.title}
+                    >{category}
                     </RaisedButton>
                 ))}
             </GridList>
@@ -82,4 +66,9 @@ class CategoriesPage extends React.Component {
     }
 }
 
-export default CategoriesPage;
+export default withRouter(connect(store => {
+    return {
+        categories: store.categories.categories,
+        authentication: store.authentication
+    };
+}, { addCategories, removeCategories })(CategoriesPage));
