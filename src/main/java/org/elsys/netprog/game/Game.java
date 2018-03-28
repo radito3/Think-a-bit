@@ -1,18 +1,14 @@
 package org.elsys.netprog.game;
 
-import org.elsys.netprog.model.Categories;
-import org.elsys.netprog.model.Question;
-import org.elsys.netprog.model.Stages;
-import org.elsys.netprog.model.User;
-
 public interface Game {
 
-    Categories getCurrentCategory();
+    void playCategory(int categoryId);
 
-    Question getCurrentQuestion();
+    void playStage(int stageId);
 
-    User getCurrrentUser();
+    void checkIfCurrentStageIsComplete();
 
-    Stages getCurrentStage();
+    void playQuesion(int questionId);
 
+    <T> void answerQuestion(T[] answer);
 }

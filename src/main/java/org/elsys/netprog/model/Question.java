@@ -1,11 +1,6 @@
 package org.elsys.netprog.model;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.Column;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -22,6 +17,9 @@ public class Question implements Serializable {
 
     @Column(columnDefinition = "mysql->text", name = "Title", nullable = false, insertable = false, updatable = false)
     private String Title;
+
+    @Transient
+    private boolean isSolved = false;
 
     public Question() {}
 
@@ -57,5 +55,13 @@ public class Question implements Serializable {
 
     public void setTitle(String title) {
         Title = title;
+    }
+
+    public boolean isSolved() {
+        return isSolved;
+    }
+
+    public void setSolved(boolean solved) {
+        isSolved = solved;
     }
 }

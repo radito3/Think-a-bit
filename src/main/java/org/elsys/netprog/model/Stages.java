@@ -2,6 +2,10 @@ package org.elsys.netprog.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Entity
 @Table(name = "Stages")
@@ -16,6 +20,22 @@ public class Stages implements Serializable {
 
     @Transient
     private boolean isUnlocked = false;
+
+    @Transient
+    private List<Question> questions;
+
+    @Transient
+    private Timer timeout = new Timer();
+
+    public void setTimeout(int seconds) {
+        this.timeout.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                setUnlocked(true);
+                this.cancel(); //not sure if needed
+            }
+        }, seconds * 1000);
+    }
 
     public Stages() {}
 
@@ -46,5 +66,27 @@ public class Stages implements Serializable {
 
     public void setUnlocked(boolean unlocked) {
         isUnlocked = unlocked;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Stages stages = (Stages) object;
+        return Id == stages.Id &&
+                CategoryId == stages.CategoryId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id, CategoryId);
     }
 }
