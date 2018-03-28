@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Route, Switch, withRouter } from "react-router-dom";
 import {
     AppBar,
+    Divider,
     Drawer,
     MenuItem,
     FlatButton,
@@ -68,9 +69,19 @@ class AppContainer extends React.Component {
             </div>;
 
         const drawer = this.props.authentication.username ?
-            <Subheader>{this.props.authentication.username}</Subheader> :
-            <div><MenuItem onClick={() => this.props.history.push("/login")}>Log in</MenuItem>
-            <MenuItem onClick={() => this.props.history.push("/register")}>Register</MenuItem></div>;
+            <div>
+                <Subheader>{this.props.authentication.username}</Subheader>
+                <MenuItem>Account settings</MenuItem>
+                <MenuItem onClick={() => this.props.logout()}>Log out</MenuItem>
+                <Divider />
+                <Subheader style={{
+                    "fontSize": "30px"
+                }}>Play a game:</Subheader>
+            </div> :
+            <div>
+                <MenuItem onClick={() => this.props.history.push("/login")}>Log in</MenuItem>
+                <MenuItem onClick={() => this.props.history.push("/register")}>Register</MenuItem>
+            </div>;
 
         return <div>
             <Helmet><style>{`
@@ -92,12 +103,18 @@ class AppContainer extends React.Component {
                 }}
                 iconElementRight={authentication}
                 onLeftIconButtonClick={() => this.toggleDrawer()}
+                onTitleClick={() => this.toggleDrawer()}
             />
             <Drawer
+                docked={false}
                 open={this.state.open}
                 containerStyle={{
-                    "backgoundColor": "#A5D6A7"
+                    "backgroundColor": "#C8E6C9"
                 }}
+                overlayStyle={{
+                    "opacity": "0"
+                }}
+                onRequestChange={open => this.setState({ open }) }
             >
                 <AppBar
                     title="Think-a-bit"
@@ -106,6 +123,7 @@ class AppContainer extends React.Component {
                     }}
                     iconElementLeft={<IconButton><NavigationClose /></IconButton>}
                     onLeftIconButtonClick={() => this.toggleDrawer()}
+                    onTitleClick={() => this.toggleDrawer()}
                 />
                 {drawer}
             </Drawer>
