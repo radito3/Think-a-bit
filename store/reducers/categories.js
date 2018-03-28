@@ -1,17 +1,17 @@
-const reducer = (state = { username: "" }, action) => {
+const reducer = (state = { categories: [] }, action) => {
     switch (action.type) {
-        case "LOGIN":
+        case "ADD_CATEGORIES":
             return {
                 ...state,
-                username: action.payload.username
+                categories: action.payload
             };
-        case "LOGOUT":
+        case "REMOVE_CATEGORIES":
             return {
                 ...state,
-                username: ""
+                categories: []
             };
     }
     return state;
-};
+}
 
 export default reducer;
