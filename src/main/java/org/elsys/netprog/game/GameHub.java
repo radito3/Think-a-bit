@@ -1,8 +1,6 @@
 package org.elsys.netprog.game;
 
-import org.elsys.netprog.model.Categories;
-import org.elsys.netprog.model.Question;
-import org.elsys.netprog.model.Stages;
+import org.elsys.netprog.model.*;
 
 import java.util.Iterator;
 import java.util.stream.Collectors;
@@ -18,6 +16,7 @@ public class GameHub extends AbstractGame implements Game {
     private void setupEnvironment() {
         categories = IntStream.range(1, 10/*брой категории*/).mapToObj(i ->
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
+        // manually set QuestionCategories
         //TODO set QuestionCategories appropriately to the Category
     }
 
@@ -33,18 +32,29 @@ public class GameHub extends AbstractGame implements Game {
     @Override
     public void playStage(int stageId) {
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
+        StageAttempts sa = new StageAttempts(currentStage.getId(),
+                currrentUser.getId(), currentCategory.getId());
 
         if (currentCategory.getStages().get(0).equals(stage)) {
             currentStage = stage;
             currentStage.setUnlocked(true);
+
+            sa.setAttempts(STAGE_ATTEMPTS.get(1));
+            db.processObject(s -> s.save(sa));
             //render stage along with questions
         } else if (!stage.isUnlocked()) {
             throw new IllegalStateException("Stage is locked");
         } else {
             currentStage = stage;
+
+            sa.setAttempts(STAGE_ATTEMPTS.get(getStageIndex(currentStage) + 1));
             //render stage
         }
         //TODO each consecutive stage in a category should have less attempts (process a StageAttempts object)
+    }
+
+    private int getStageIndex(Stages stage) {
+        return currentCategory.getStages().indexOf(stage);
     }
 
     @Override
@@ -54,10 +64,23 @@ public class GameHub extends AbstractGame implements Game {
             currentStage.setTimeout(180);
         }
 
-        for (Iterator<Stages> it = currentCategory.getStages().iterator(); it.hasNext(); it.next()) {
+        for (Iterator<Stages> it = currentCategory.getStages().iterator(); it.hasNext();) {
             if (it.equals(currentStage)) {
-                it.next().setUnlocked(true);
-                //TODO insert into UserProgress, reset current stage attempts in StageAttempts
+                int currentStageIndex = getStageIndex(currentStage);
+
+                currentUserProgress = new UserProgress(currrentUser.getId(), currentCategory.getId());
+                currentUserProgress.setReachedStage(currentStageIndex + 1);
+
+                db.processObject(s -> s.save(currentUserProgress));
+
+                StageAttempts sa = new StageAttempts(currentStage.getId(),
+                        currrentUser.getId(), currentCategory.getId());
+                sa.setAttempts(STAGE_ATTEMPTS.get(currentStageIndex + 1));
+
+                db.processObject(s -> s.update(sa));
+
+                currentStage = it.next();
+                currentStage.setUnlocked(true);
                 break;
             }
         }

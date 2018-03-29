@@ -1,12 +1,11 @@
 package org.elsys.netprog.game;
 
+import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.elsys.netprog.db.DatabaseUtil;
-import org.elsys.netprog.model.Categories;
-import org.elsys.netprog.model.Question;
-import org.elsys.netprog.model.Stages;
-import org.elsys.netprog.model.User;
+import org.elsys.netprog.model.*;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractGame {
 
@@ -23,6 +22,15 @@ public abstract class AbstractGame {
     User currrentUser;
 
     Stages currentStage;
+
+    UserProgress currentUserProgress;
+
+    //this variable may be temporary - could use StageAttempts::getAttempts() with the needed category stage
+    static final Map<Integer, Integer> STAGE_ATTEMPTS = ImmutableMap.of(1, 10,
+            2, 9,
+            3, 8,
+            4, 7,
+            5, 6);
 
     AbstractGame() {
         db = DatabaseUtil.getInstance();
@@ -42,5 +50,9 @@ public abstract class AbstractGame {
 
     public Stages getCurrentStage() {
         return currentStage;
+    }
+
+    public UserProgress getCurrentUserProgress() {
+        return currentUserProgress;
     }
 }

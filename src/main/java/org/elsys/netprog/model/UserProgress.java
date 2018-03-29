@@ -24,10 +24,9 @@ public class UserProgress implements Serializable {
 
     public UserProgress() {}
 
-    public UserProgress(int userId, int categoryId, int reachedStage) {
+    public UserProgress(int userId, int categoryId) {
         this.UserId = userId;
         this.CategoryId = categoryId;
-        this.ReachedStage = reachedStage;
     }
 
     @Override

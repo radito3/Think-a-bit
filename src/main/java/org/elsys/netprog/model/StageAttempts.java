@@ -24,15 +24,14 @@ public class StageAttempts implements Serializable {
     private int CategoryId;
 
     @Column(columnDefinition = "mysql->int(11)", name = "Attempts", nullable = false)
-    private int Attempts;
+    private int Attempts = 0;
 
     public StageAttempts() {}
 
-    public StageAttempts(int stageId, int userId, int categoryId, int attempts) {
+    public StageAttempts(int stageId, int userId, int categoryId) {
         this.StageId = stageId;
         this.UserId = userId;
         this.CategoryId = categoryId;
-        this.Attempts = attempts;
     }
 
     @Override
