@@ -25,6 +25,8 @@ public abstract class AbstractGame {
 
     UserProgress currentUserProgress;
 
+    StageAttempts currentStageAttempts;
+
     //this variable may be temporary - could use StageAttempts::getAttempts() with the needed category stage
     static final Map<Integer, Integer> STAGE_ATTEMPTS = ImmutableMap.of(1, 10,
             2, 9,
@@ -54,5 +56,9 @@ public abstract class AbstractGame {
 
     public UserProgress getCurrentUserProgress() {
         return currentUserProgress;
+    }
+
+    public StageAttempts getCurrentStageAttempts() {
+        return currentStageAttempts;
     }
 }

@@ -10,5 +10,7 @@ public interface Game {
 
     void playQuesion(int questionId);
 
-    <T> void answerQuestion(T[] answer);
+    boolean answerOpenQuestion(String answer);
+
+    boolean answerClosedQuestion(String... answers);
 }

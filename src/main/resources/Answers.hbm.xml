@@ -16,7 +16,7 @@
 
         <property name = "QuestionId" type = "int" column = "QuestionId" />
         <property name = "Payload" type = "int" column = "Payload" />
-        <!--<property name = "IsCorrect" type = "boolean" column = "IsCorrect" />-->
+        <property name = "IsCorrect" type = "boolean" column = "IsCorrect" />
 
     </class>
 </hibernate-mapping>

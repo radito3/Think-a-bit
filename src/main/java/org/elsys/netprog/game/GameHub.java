@@ -2,9 +2,11 @@ package org.elsys.netprog.game;
 
 import org.elsys.netprog.model.*;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class GameHub extends AbstractGame implements Game {
 
@@ -93,26 +95,47 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public <T> void answerQuestion(T[] answer) {
-//        if (currentQuestion.getType() == Question.Type.CLOSED_MANY &&
-//                answer.getClass() != Integer[].class) {
-//            if (answer.length == 1) {
-//                throw new IllegalArgumentException("Invalid type of argument");
-//            }
-//        } else if (currentQuestion.getType() == Question.Type.CLOSED_ONE &&
-//                answer.getClass() != Integer[].class) {
-//            if (answer.length != 1) {
-//                throw new IllegalArgumentException("Invalid type of argument");
-//            }
-//        } else if (currentQuestion.getType() == Question.Type.OPEN &&
-//                answer.getClass() != String[].class) {
-//            if (answer.length != 1) {
-//                throw new IllegalArgumentException("Invalid type of argument");
-//            }
-//        }
-        //TODO check if correct type of answer for question (string - open, int[] - closed_many, int - closed_one)
-        //TODO if correct -> question is rendered answered (Question::setSolved(true)), attempts are not reduced
-        //TODO if incorrect -> StageAttempts.setAttempts (getAttempts - 1)
+    public boolean answerOpenQuestion(String answer) {
+        Answers correct = (Answers) db.getObject(s ->
+                s.createQuery("FROM Answers WHERE QuestionId = " +
+                        currentQuestion.getId() + " AND IsCorrect = true").uniqueResult());
+
+        if (correct.getPayload().equals(answer)) {
+            currentQuestion.setSolved(true);
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    @Override
+    public boolean answerClosedQuestion(String... answers) {
+        if (currentQuestion.getType() == Question.Type.CLOSED_ONE) {
+            Answers correct = (Answers) db.getObject(s ->
+                    s.createQuery("FROM Answers WHERE QuestionId = " +
+                            currentQuestion.getId() + " AND IsCorrect = true").uniqueResult());
+
+            if (correct.getPayload().equals(answers[0])) {
+                currentQuestion.setSolved(true);
+                return true;
+            } else {
+                currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
+                return false;
+            }
+        } else {
+            Stream<Answers> correct = db.getObject(s ->
+                    s.createQuery("FROM Answers WHERE QuestionId = " +
+                            currentQuestion.getId() + " AND IsCorrect = true").getResultStream());
+
+            Stream<String> all = Stream.concat(correct.map(Answers::getPayload), Arrays.stream(answers));
+
+            if (all.reduce((a, b) -> a.equals(b) ? "" : a).get().length() == 0) {
+                currentQuestion.setSolved(true);
+                return true;
+            } else {
+                currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
+                return false;
+            }
+        }
+    }
 }
