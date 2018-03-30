@@ -65,7 +65,7 @@ public class GameHub extends AbstractGame implements Game {
             currentStage.setUnlocked(false);
             currentStage.setTimeout(180);
         }
-
+        //need to revise
         for (Iterator<Stages> it = currentCategory.getStages().iterator(); it.hasNext();) {
             if (it.equals(currentStage)) {
                 int currentStageIndex = getStageIndex(currentStage);
@@ -90,52 +90,47 @@ public class GameHub extends AbstractGame implements Game {
 
     @Override
     public void playQuesion(int questionId) {
+        //the question could also be gotten from the list of questions from this::currentStage
         currentQuestion = db.getObject(s -> s.get(Question.class, questionId));
         //render question with answers or field for open answer (by getType())
     }
 
     @Override
-    public boolean answerOpenQuestion(String answer) {
-        Answers correct = (Answers) db.getObject(s ->
-                s.createQuery("FROM Answers WHERE QuestionId = " +
-                        currentQuestion.getId() + " AND IsCorrect = true").uniqueResult());
+    public boolean answerQuestion(String... answers) {
+        if (currentQuestion.getType() == Question.Type.CLOSED_MANY) {
+            Stream<Answers> correct = db.getObject(s -> s.createQuery(getCorrectAnswerQuery()).getResultStream());
 
-        if (correct.getPayload().equals(answer)) {
-            currentQuestion.setSolved(true);
-            return true;
+            Stream<String> allAnswers = Stream.concat(correct.map(Answers::getPayload), Arrays.stream(answers));
+
+            if (allAnswers.reduce((a, b) -> a.equals(b) ? "" : a).get().length() == 0) {
+                return correctAnswer();
+            } else {
+                return wrongAnswer();
+            }
         } else {
-            return false;
+            Answers correct = (Answers) db.getObject(s -> s.createQuery(getCorrectAnswerQuery()).uniqueResult());
+
+            if (correct.getPayload().equals(answers[0])) {
+                return correctAnswer();
+            } else {
+                return wrongAnswer();
+            }
         }
     }
 
-    @Override
-    public boolean answerClosedQuestion(String... answers) {
-        if (currentQuestion.getType() == Question.Type.CLOSED_ONE) {
-            Answers correct = (Answers) db.getObject(s ->
-                    s.createQuery("FROM Answers WHERE QuestionId = " +
-                            currentQuestion.getId() + " AND IsCorrect = true").uniqueResult());
+    private String getCorrectAnswerQuery() {
+        return "FROM Answers WHERE QuestionId = " + currentQuestion.getId() + " AND IsCorrect = true";
+    }
 
-            if (correct.getPayload().equals(answers[0])) {
-                currentQuestion.setSolved(true);
-                return true;
-            } else {
-                currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
-                return false;
-            }
-        } else {
-            Stream<Answers> correct = db.getObject(s ->
-                    s.createQuery("FROM Answers WHERE QuestionId = " +
-                            currentQuestion.getId() + " AND IsCorrect = true").getResultStream());
+    private boolean correctAnswer() {
+        currentQuestion.setSolved(true);
+        currentStage.getQuestions().get(currentStage.getQuestions().indexOf(currentQuestion)).setSolved(true);
+        return true;
+    }
 
-            Stream<String> all = Stream.concat(correct.map(Answers::getPayload), Arrays.stream(answers));
-
-            if (all.reduce((a, b) -> a.equals(b) ? "" : a).get().length() == 0) {
-                currentQuestion.setSolved(true);
-                return true;
-            } else {
-                currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
-                return false;
-            }
-        }
+    private boolean wrongAnswer() {
+        currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
+        db.processObject(s -> s.update(currentStageAttempts));
+        return false;
     }
 }

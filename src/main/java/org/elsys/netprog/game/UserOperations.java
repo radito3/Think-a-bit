@@ -4,9 +4,9 @@ import org.elsys.netprog.model.User;
 
 public interface UserOperations {
 
-    void register(User user);
+    void register(String userName, String password);
 
-    User login(String userName, String passWord);
+    User login(String userName, String password) throws IllegalAccessException;
 
     void logout();
 }

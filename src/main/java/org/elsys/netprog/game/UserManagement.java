@@ -9,20 +9,27 @@ public class UserManagement extends AbstractGame implements UserOperations {
     }
 
     @Override
-    public User login(String userName, String passWord) {
-        //need to check for non-existant user
-        User u = (User) db.getObject(s ->
-                s.createQuery("FROM User WHERE UserName = '" + userName +
-                        "' AND Password = '" + passWord + "'").uniqueResult());
+    public User login(String userName, String password) throws IllegalAccessException {
+        User user;
 
-        currrentUser = u;
+        try {
+            user = (User) db.getObject(s ->
+                    s.createQuery("FROM User WHERE UserName = '" + userName +
+                            "' AND Password = '" + password + "'").uniqueResult());
+        } catch (Exception e) {
+            throw new IllegalAccessException("No such user"); //or more than 1 user with same credentials
+        }
 
-        return u;
+        currrentUser = user;
+
+        return user;
     }
 
     @Override
-    public void register(User user) {
+    public void register(String userName, String password) {
+        User user = new User(userName, password);
         db.processObject(s -> s.save(user));
+        currrentUser = user;
     }
 
     @Override

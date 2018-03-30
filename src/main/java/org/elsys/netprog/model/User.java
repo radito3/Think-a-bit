@@ -1,6 +1,7 @@
 package org.elsys.netprog.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -9,7 +10,9 @@ import java.util.Objects;
 public class User implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "mysql->int(11)", name = "Id", nullable = false, unique = true)
+    @NotNull
     private int Id;
 
     @Column(columnDefinition = "mysql->varchar(64)", name = "UserName", nullable = false)
@@ -20,8 +23,7 @@ public class User implements Serializable {
 
     public User() {}
 
-    public User(int Id, String UserName, String Password) {
-        this.Id = Id;
+    public User(String UserName, String Password) {
         this.UserName = UserName;
         this.Password = Password;
     }
