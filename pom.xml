@@ -109,6 +109,11 @@
             <artifactId>hibernate-core</artifactId>
             <version>5.2.13.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
     </dependencies>
 
 </project>

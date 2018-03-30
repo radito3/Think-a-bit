@@ -38,6 +38,8 @@ public abstract class AbstractGame {
         db = DatabaseUtil.getInstance();
     }
 
+    /**these are to be used when building the json models for React rendering*/
+
     public Categories getCurrentCategory() {
         return currentCategory;
     }
