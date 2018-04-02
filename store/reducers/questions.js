@@ -18,11 +18,6 @@ const reducer = (state = { questions: [], currentQuestionIndex: 0 }, action) => 
                 questions: [],
                 currentQuestionIndex: 0
             };
-        // case "SELECT_ANSWER":
-        //     return {
-        //         ...state,
-        //         questions: state.questions.
-        //     };
         case "NEXT_QUESTION":
             return {
                 ...state,
@@ -35,6 +30,56 @@ const reducer = (state = { questions: [], currentQuestionIndex: 0 }, action) => 
                 currentQuestionIndex: (state.currentQuestionIndex - 1 >= 0) ?
                     state.currentQuestionIndex - 1 : state.currentQuestionIndex
             };
+        case "SELECT_ANSWER":
+            return {
+                ...state,
+                questions: state.questions.map((question, index) => {
+                    if (index === state.currentQuestionIndex) {
+                        switch (question.type) {
+                            case "CLOSED_MANY":
+                                return {
+                                    ...question,
+                                    answers: question.answers.map(answer => {
+                                        if (answer.content === action.payload) {
+                                            return {
+                                                ...answer,
+                                                isSelected: !answer.isSelected
+                                            };
+                                        } else {
+                                            return answer;
+                                        }
+                                    })
+                                };
+                            case "CLOSED_ONE":
+                                return {
+                                    ...question,
+                                    answers: question.answers.map(answer => {
+                                        if (answer.content === action.payload) {
+                                            return {
+                                                ...answer,
+                                                isSelected: true
+                                            };
+                                        } else {
+                                            return {
+                                                ...answer,
+                                                isSelected: false
+                                            };
+                                        }
+                                    })
+                                }
+                            case "OPEN":
+                                return {
+                                    ...question,
+                                    answer: action.payload
+                                };
+                            default:
+                                return question;
+                        }
+                    } else {
+                        return question;
+                    }
+                })
+            }
     }
     return state;
 };
