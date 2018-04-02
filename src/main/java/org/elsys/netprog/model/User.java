@@ -28,6 +28,12 @@ public class User implements Serializable {
         this.Password = Password;
     }
 
+    public User(int Id, String UserName, String Password) {
+        this.Id = Id;
+        this.UserName = UserName;
+        this.Password = Password;
+    }
+
     public int getId() {
         return Id;
     }

@@ -9,4 +9,6 @@ public interface UserOperations {
     User login(String userName, String password) throws IllegalAccessException;
 
     void logout();
+
+    User getUser(int id);
 }
