@@ -1,0 +1,19 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name = "org.elsys.netprog.model.QuestionStages" table = "QuestionStages">
+
+        <meta attribute = "class-description">
+            This class contains the question and stage tables relation.
+        </meta>
+
+        <composite-id>
+            <key-property name = "QuestionId" type = "int" column = "QuestionId" />
+            <key-property name = "StageId" type = "int" column = "StageId" />
+        </composite-id>
+
+    </class>
+</hibernate-mapping>
