@@ -28,19 +28,20 @@ public class GameHub extends AbstractGame implements Game {
         categories = IntStream.range(1, 10).mapToObj(i ->
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
 
-        categories.forEach(category -> {
-
+//        categories.forEach(category -> {
+//
 //            category.setStages();
-        });
+//        });
     }
 
     @Override
-    public void playCategory(int categoryId) {
+    public GameHub playCategory(int categoryId) {
         //here there is a second select query to the db for the same info as in setupEnv()
         currentCategory = db.getObject(s -> s.get(Categories.class, categoryId));
 
 //        currentCategory.setStages(IntStream.range(1, 10/*броя нива за тази категория*/).mapToObj(i ->
 //            db.getObject(s -> s.get(Stages.class, i))).collect(Collectors.toList()));
+        return this;
     }
 
     @Override

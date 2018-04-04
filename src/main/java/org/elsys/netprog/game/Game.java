@@ -1,8 +1,12 @@
 package org.elsys.netprog.game;
 
+import org.elsys.netprog.model.Categories;
+
 public interface Game {
 
-    void playCategory(int categoryId);
+    Categories getCurrentCategory();
+
+    GameHub playCategory(int categoryId);
 
     void playStage(int stageId);
 
