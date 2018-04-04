@@ -3,22 +3,10 @@ import { Redirect, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { GridList, RaisedButton } from "material-ui";
 import StarBorder from "material-ui/svg-icons/toggle/star-border";
-import { addCategories, removeCategories } from "../store/actions/categories";
 
 class CategoriesPage extends React.Component {
     constructor(props) {
         super(props);
-
-        this.props.addCategories([
-            "Biology",
-            "Literature",
-            "History",
-            "Maths",
-            "Astronomy",
-            "Geography",
-            "Programming",
-            "All"
-        ]);
     }
 
     render() {
@@ -27,11 +15,6 @@ class CategoriesPage extends React.Component {
         }
 
         const styles = {
-            root: {
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'space-around',
-            },
             gridList: {
                 width: '100%',
                 height: '100%',
@@ -40,9 +23,9 @@ class CategoriesPage extends React.Component {
         };
 
         return <div style={styles.root}>
+            <h1>Select a category</h1>
             <GridList
                 cellHeight={180}
-                style={styles.gridList}
                 cols={4}
                 padding={8}
             >
@@ -71,4 +54,4 @@ export default withRouter(connect(store => {
         categories: store.categories.categories,
         authentication: store.authentication
     };
-}, { addCategories, removeCategories })(CategoriesPage));
+})(CategoriesPage));
