@@ -2,11 +2,14 @@ package org.elsys.netprog.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "Users")
+@XmlRootElement
 public class User implements Serializable {
 
     @Id
@@ -39,7 +42,6 @@ public class User implements Serializable {
     }
 
     public void setId(int id) {
-        //validation check
         Id = id;
     }
 
@@ -48,7 +50,12 @@ public class User implements Serializable {
     }
 
     public void setUserName(String userName) {
-        //check for string validation
+        Pattern invalidInput = Pattern.compile("[^-_.a-zA-Z0-9]");
+
+        if (invalidInput.matcher(UserName).find()) {
+            throw new IllegalArgumentException("Illegal characters in Username");
+        }
+
         UserName = userName;
     }
 
@@ -57,7 +64,12 @@ public class User implements Serializable {
     }
 
     public void setPassword(String password) {
-        //check for string validation
+        Pattern invalidInput = Pattern.compile("[^-_.a-zA-Z0-9]");
+
+        if (invalidInput.matcher(UserName).find()) {
+            throw new IllegalArgumentException("Illegal characters in Password");
+        }
+
         Password = password;
     }
 
