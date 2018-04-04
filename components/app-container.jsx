@@ -19,6 +19,7 @@ import CategoriesPage from "./categories-page.jsx";
 import StagesPage from "./stages-page.jsx";
 import QuestionPage from "./question-page.jsx";
 import { logout } from "../store/actions/authentication";
+import { addCategories, removeCategories } from "../store/actions/categories";
 
 class AppContainer extends React.Component {
     constructor(props) {
@@ -27,6 +28,17 @@ class AppContainer extends React.Component {
         this.state = {
             open: false
         };
+
+        this.props.addCategories([
+            "Biology",
+            "Literature",
+            "History",
+            "Maths",
+            "Astronomy",
+            "Geography",
+            "Programming",
+            "All"
+        ]);
     }
 
     toggleDrawer() {
@@ -147,4 +159,4 @@ export default withRouter(connect(store => {
         authentication: store.authentication,
         categories: store.categories.categories
     };
-}, { logout })(AppContainer));
+}, { addCategories, removeCategories, logout })(AppContainer));
