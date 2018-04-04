@@ -66,3 +66,11 @@ CREATE TABLE StageAttempts (
   FOREIGN KEY (CategoryId) REFERENCES Categories(Id)
 );
 
+CREATE TABLE QuestionStages (
+  QuestionId INTEGER NOT NULL,
+  StageId INTEGER NOT NULL,
+
+  PRIMARY KEY (QuestionId, StageId),
+  FOREIGN KEY (QuestionId) REFERENCES Question(Id),
+  FOREIGN KEY (StageId) REFERENCES Stages(Id)
+);

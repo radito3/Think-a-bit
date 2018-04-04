@@ -10,16 +10,28 @@ import java.util.stream.Stream;
 
 public class GameHub extends AbstractGame implements Game {
 
-    public GameHub() {
+    private static GameHub instance;
+
+    private GameHub() {
         super();
         setupEnvironment();
     }
 
+    public static GameHub getInstance() {
+        if (instance == null) {
+            instance = new GameHub();
+        }
+        return instance;
+    }
+
     private void setupEnvironment() {
-        categories = IntStream.range(1, 10/*брой категории*/).mapToObj(i ->
+        categories = IntStream.range(1, 10).mapToObj(i ->
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
-        // manually set QuestionCategories
-        //TODO set QuestionCategories appropriately to the Category
+
+        categories.forEach(category -> {
+
+//            category.setStages();
+        });
     }
 
     @Override
@@ -27,13 +39,14 @@ public class GameHub extends AbstractGame implements Game {
         //here there is a second select query to the db for the same info as in setupEnv()
         currentCategory = db.getObject(s -> s.get(Categories.class, categoryId));
 
-        currentCategory.setStages(IntStream.range(1, 10/*броя нива за тази категория*/).mapToObj(i ->
-            db.getObject(s -> s.get(Stages.class, i))).collect(Collectors.toList()));
+//        currentCategory.setStages(IntStream.range(1, 10/*броя нива за тази категория*/).mapToObj(i ->
+//            db.getObject(s -> s.get(Stages.class, i))).collect(Collectors.toList()));
     }
 
     @Override
     public void playStage(int stageId) {
-        Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
+        Stages stage = db.getObject(s -> s.get(Stages.class, stageId)); //this should not be from the db
+        //but from the List<Stages> in the category
         StageAttempts sa = new StageAttempts(currentStage.getId(),
                 currrentUser.getId(), currentCategory.getId());
 
@@ -90,7 +103,6 @@ public class GameHub extends AbstractGame implements Game {
 
     @Override
     public void playQuesion(int questionId) {
-        //the question could also be gotten from the list of questions from this::currentStage
         currentQuestion = db.getObject(s -> s.get(Question.class, questionId));
         //render question with answers or field for open answer (by getType())
     }
