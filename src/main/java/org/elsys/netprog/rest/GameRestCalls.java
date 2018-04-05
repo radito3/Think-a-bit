@@ -6,15 +6,10 @@ import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
 import org.elsys.netprog.view.JsonWrapper;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Path("/game")
 public class GameRestCalls {
@@ -34,7 +29,6 @@ public class GameRestCalls {
         try {
             output = JsonWrapper.getJsonFromObject(category);
         } catch (IOException e) {
-            Logger.getLogger(GameHub.class.getName()).log(Level.FINE, e.getMessage(), e);
             System.err.println(e.getMessage());
             return Response.status(500).entity("{\"msg\":\"Internal Server Error\"}").build();
         }
@@ -43,9 +37,9 @@ public class GameRestCalls {
     }
 
     @GET
-    @Path("/{questionId}")
+    @Path("/getQuestion")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQuestion(@PathParam("questionId") int questionId) {
+    public Response getQuestion(@DefaultValue("1") @QueryParam("questionId") int questionId) {
         Question question = game.getCurrentQuestion() == null ||
                 game.getCurrentQuestion().getId() != questionId ?
                 game.playQuesion(questionId).getCurrentQuestion() :

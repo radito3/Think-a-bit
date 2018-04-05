@@ -47,13 +47,13 @@ public class UserManagement extends AbstractGame implements UserOperations {
         return db.getObject(s -> s.get(User.class, id));
     }
 
-    public void update() {
-
-    }
-
-    public void delete() {
-
-    }
+//    public void update() {
+//
+//    }
+//
+//    public void delete() {
+//
+//    }
 
     private static String cryptWithMD5(String pass) {
         try {

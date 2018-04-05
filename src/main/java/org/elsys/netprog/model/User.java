@@ -2,6 +2,8 @@ package org.elsys.netprog.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
@@ -9,7 +11,8 @@ import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "Users")
-@XmlRootElement
+@XmlRootElement(name = "user")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class User implements Serializable {
 
     @Id
