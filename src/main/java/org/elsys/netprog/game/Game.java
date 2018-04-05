@@ -3,19 +3,45 @@ package org.elsys.netprog.game;
 import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
 
+import java.util.List;
+
 public interface Game {
 
-    Categories getCurrentCategory();
+    /**
+     * Get the Categories from the game.
+     *
+     * @return A {@link java.util.List} containing the Categories
+     */
+    default List<Categories> getCategories() {
+        return null;
+    }
 
-    Question getCurrentQuestion();
+    /**
+     * Get the current Category,
+     *
+     * @return The Category object
+     */
+    default Categories getCurrentCategory() {
+        return null;
+    }
 
-    GameHub playCategory(int categoryId);
+    /**
+     * Play a category with the given Id.
+     *
+     * @param categoryId The Id by witch the Category should be identified
+     * @return The GameHub instance that is used for the current game session
+     */
+    default GameHub playCategory(int categoryId) {
+        return null;
+    }
 
-    void playStage(int stageId);
+    default List<Question> playStage(int stageId) {
+        return null;
+    }
 
-    void checkIfCurrentStageIsComplete();
+    default void checkIfCurrentStageIsComplete() {}
 
-    GameHub playQuesion(int questionId);
-
-    boolean answerQuestion(String... answers);
+    default boolean answerQuestion(Question question, String... answers) {
+        return false;
+    }
 }

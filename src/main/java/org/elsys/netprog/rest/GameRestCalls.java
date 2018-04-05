@@ -6,10 +6,16 @@ import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
 import org.elsys.netprog.view.JsonWrapper;
 
-import javax.ws.rs.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 
 @Path("/game")
 public class GameRestCalls {
@@ -17,7 +23,22 @@ public class GameRestCalls {
     private Game game = GameHub.getInstance();
 
     @GET
-    @Path("/{categoryId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIndexPage() {
+        String output;
+
+        try {
+            output = JsonWrapper.getJsonFromObject(game.getCategories());
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return Response.status(500).build();
+        }
+
+        return Response.status(200).entity(output).build();
+    }
+
+    @GET
+    @Path("/category/{categoryId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategory(@PathParam("categoryId") int categoryId) {
         Categories category = game.getCurrentCategory() == null ||
@@ -30,27 +51,26 @@ public class GameRestCalls {
             output = JsonWrapper.getJsonFromObject(category);
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            return Response.status(500).entity("{\"msg\":\"Internal Server Error\"}").build();
+            return Response.status(500).build();
         }
 
         return Response.status(200).entity(output).build();
     }
 
     @GET
-    @Path("/getQuestion")
+    @Path("/stageQuestions")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQuestion(@DefaultValue("1") @QueryParam("questionId") int questionId) {
-        Question question = game.getCurrentQuestion() == null ||
-                game.getCurrentQuestion().getId() != questionId ?
-                game.playQuesion(questionId).getCurrentQuestion() :
-                game.getCurrentQuestion();
+    public Response getStageQuestions(@DefaultValue("1") @QueryParam("stageId") int stageId) {
         String output;
+        List<Question> list = game.playStage(stageId);
 
         try {
-            output = JsonWrapper.getJsonFromObject(question);
+            output = JsonWrapper.getJsonFromObject(list);
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            return Response.status(500).entity("{\"msg\":\"Internal Server Error\"}").build();
+            return Response.status(500).build();
+        } catch (IllegalStateException e) {
+            return Response.status(400).entity("\"msg\":\"" + e.getMessage() + "\"").build();
         }
 
         return Response.status(200).entity(output).build();

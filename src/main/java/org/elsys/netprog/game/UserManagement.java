@@ -39,7 +39,6 @@ public class UserManagement extends AbstractGame implements UserOperations {
     @Override
     public void logout() {
         currrentUser = null;
-        //render index page without user
     }
 
     @Override
