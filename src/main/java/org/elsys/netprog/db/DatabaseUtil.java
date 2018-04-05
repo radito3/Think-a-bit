@@ -34,7 +34,6 @@ public class DatabaseUtil implements Connector {
         factory = Connector.connect();
     }
 
-
     /**
      * Save, Update or Delete an object to the Database.
      *

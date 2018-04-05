@@ -28,7 +28,8 @@ public interface Connector {
                 .addAnnotatedClass(Answers.class)
                 .addAnnotatedClass(StageAttempts.class)
                 .addAnnotatedClass(Stages.class)
-                .addAnnotatedClass(UserProgress.class);
+                .addAnnotatedClass(UserProgress.class)
+                .addAnnotatedClass(QuestionStages.class);
 
         ServiceRegistry registry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();

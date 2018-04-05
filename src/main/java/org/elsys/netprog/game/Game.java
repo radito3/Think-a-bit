@@ -1,10 +1,13 @@
 package org.elsys.netprog.game;
 
 import org.elsys.netprog.model.Categories;
+import org.elsys.netprog.model.Question;
 
 public interface Game {
 
     Categories getCurrentCategory();
+
+    Question getCurrentQuestion();
 
     GameHub playCategory(int categoryId);
 
@@ -12,7 +15,7 @@ public interface Game {
 
     void checkIfCurrentStageIsComplete();
 
-    void playQuesion(int questionId);
+    GameHub playQuesion(int questionId);
 
     boolean answerQuestion(String... answers);
 }

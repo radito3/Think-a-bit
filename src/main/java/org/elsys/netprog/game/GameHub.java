@@ -103,9 +103,10 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public void playQuesion(int questionId) {
+    public GameHub playQuesion(int questionId) {
         currentQuestion = db.getObject(s -> s.get(Question.class, questionId));
         //render question with answers or field for open answer (by getType())
+        return this;
     }
 
     @Override
