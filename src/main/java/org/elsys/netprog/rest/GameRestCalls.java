@@ -4,14 +4,10 @@ import org.elsys.netprog.game.Game;
 import org.elsys.netprog.game.GameHub;
 import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
+import org.elsys.netprog.model.Stages;
 import org.elsys.netprog.view.JsonWrapper;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -45,7 +41,7 @@ public class GameRestCalls {
                 game.getCurrentCategory().getId() != categoryId ?
                 game.playCategory(categoryId).getCurrentCategory() :
                 game.getCurrentCategory();
-        String output;
+        String output; //includes which stage is unlocked
 
         try {
             output = JsonWrapper.getJsonFromObject(category);
@@ -58,14 +54,18 @@ public class GameRestCalls {
     }
 
     @GET
-    @Path("/stageQuestions")
+    @Path("/stage")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStageQuestions(@DefaultValue("1") @QueryParam("stageId") int stageId) {
         String output;
-        List<Question> list = game.playStage(stageId);
+        Stages stage = game.getCurrentStage() == null ||
+                game.getCurrentStage().getId() != stageId ?
+                game.playStage(stageId).getCurrentStage() :
+                game.getCurrentStage();
+        List<Question> questions = stage.getQuestions();
 
         try {
-            output = JsonWrapper.getJsonFromObject(list);
+            output = JsonWrapper.getJsonFromObject(questions);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             return Response.status(500).build();
@@ -86,6 +86,15 @@ public class GameRestCalls {
         } catch (IllegalAccessException e) {
             return Response.status(403).entity("\"msg\":\"" + e.getMessage() + "\"").build();
         }
+
+        return Response.status(200).build();
+    }
+
+    @POST
+    @Path("/stage")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response submitAnswers() {
 
         return Response.status(200).build();
     }

@@ -2,6 +2,7 @@ package org.elsys.netprog.game;
 
 import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
+import org.elsys.netprog.model.Stages;
 
 import java.util.List;
 
@@ -26,6 +27,15 @@ public interface Game {
     }
 
     /**
+     * Get the current Stage
+     *
+     * @return The Stage object
+     */
+    default Stages getCurrentStage() {
+        return null;
+    }
+
+    /**
      * Play a category with the given Id.
      *
      * @param categoryId The Id by which the Category is identified
@@ -39,9 +49,9 @@ public interface Game {
      * Play a stage with the given Id.
      *
      * @param stageId The Id by which the Stage is identified
-     * @return A {@link java.util.List} containing the Stage's Questions
+     * @return The GameHub instance that is used for the current game session
      */
-    default List<Question> playStage(int stageId) {
+    default GameHub playStage(int stageId) {
         return null;
     }
 

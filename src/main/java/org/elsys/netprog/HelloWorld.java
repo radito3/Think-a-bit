@@ -1,6 +1,7 @@
 package org.elsys.netprog;
 
 import org.elsys.netprog.model.User;
+import org.elsys.netprog.view.JsonWrapper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -10,12 +11,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 @Path("/test")
 public class HelloWorld {
@@ -27,6 +31,16 @@ public class HelloWorld {
     }
 
     private class Test implements ITest {
+        private int x = 0;
+
+        public int getX() {
+            return x;
+        }
+
+        public void setX(int x) {
+            this.x = x;
+        }
+
         @Override
         public int testMethod(int i) {
             return i*3;
@@ -47,6 +61,16 @@ public class HelloWorld {
     public Response testDefaultMethodOverriding() {
         ITest test = new Test();
         return Response.status(200).entity(String.valueOf(test.testMethod(2))).build();
+    }
+
+    @GET
+    @Path("/3")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response testObjectReferenceModifying() throws IOException {
+        List<Test> list = Arrays.asList(new Test(), new Test());
+        Test test = list.get(0);
+        test.setX(1);
+        return Response.status(200).entity(JsonWrapper.getJsonFromObject(list)).build();
     }
 
     @GET

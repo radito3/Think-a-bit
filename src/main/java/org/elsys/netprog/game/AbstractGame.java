@@ -41,6 +41,7 @@ public abstract class AbstractGame implements Game {
         return currentUser;
     }
 
+    @Override
     public Stages getCurrentStage() {
         return currentStage;
     }

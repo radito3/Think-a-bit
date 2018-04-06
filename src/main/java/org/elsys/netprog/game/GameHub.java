@@ -43,32 +43,30 @@ public class GameHub extends AbstractGame implements Game {
         currentCategory.setStages(IntStream.range(1, 4).mapToObj(i -> //3 stages for 1st category (temporary)
             db.getObject(s -> s.get(Stages.class, i))).collect(Collectors.toList()));
 
+        currentCategory.getStages().get(0).setUnlocked(true);
+
         return this;
     }
 
     @Override
-    public List<Question> playStage(int stageId) { //need to revise
-        Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
+    public GameHub playStage(int stageId) {
+        Stages stage = currentCategory.getStages().stream()
+                .filter(s -> s.equals(new Stages(stageId, currentCategory.getId())))
+                .findAny().get();
         StageAttempts sa = new StageAttempts(currentStage == null ? stage.getId() : currentStage.getId(),
                 currentUser.getId(), currentCategory.getId());
 
-        if (!stage.isUnlocked()) {
-            setCurrentStage(stage);
+        if (stage.isUnlocked()) {
+            currentStage = stage;
 
             sa.setAttempts(10 - getStageIndex(stage)); //default stage attempts for 1st stage are 10
             db.processObject(s -> s.update(sa));
             setStageQuestions();
 
-            return currentStage.getQuestions();
+            return this;
         } else {
             throw new IllegalStateException("Stage is locked");
         }
-    }
-
-    private void setCurrentStage(Stages stage) {
-        currentStage = stage;
-        currentStage.setUnlocked(true);
-        currentCategory.getStages().get(getStageIndex(stage)).setUnlocked(true);
     }
 
     private void setStageQuestions() {
@@ -85,36 +83,32 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public void checkIfCurrentStageIsComplete() { //need to revise
+    public void checkIfCurrentStageIsComplete() {
         if (currentStage.getQuestions().stream().allMatch(Question::isSolved)) {
-            currentStage.setUnlocked(false);
+            currentStage.setUnlocked(false); //these operations modify the object in currentCategory::stages
             currentStage.setTimeout(180);
+
+            int currentStageIndex = getStageIndex(currentStage);
+
+            currentUserProgress = new UserProgress(currentUser.getId(), currentCategory.getId());
+            currentUserProgress.setReachedStage(currentStageIndex + 1);
+
+            db.processObject(s -> s.save(currentUserProgress));
+
+            StageAttempts sa = new StageAttempts(currentStage.getId(),
+                    currentUser.getId(), currentCategory.getId());
+            sa.setAttempts(10 - currentStageIndex);
+
+            db.processObject(s -> s.update(sa));
+
+            currentCategory.getStages().get(currentStageIndex + 1).setUnlocked(true);
+            currentStage = null;
         } else {
-            //TODO lower StageAttempts by 1
-        }
+            StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
+                    new StageAttempts(currentStage.getId(), currentUser.getId(), currentCategory.getId())));
+            sa.setAttempts(sa.getAttempts() - 1);
 
-        for (Iterator<Stages> it = currentCategory.getStages().iterator(); it.hasNext();) {
-            //this needn't be done with iterating through the stages, it could be from just getting the stage
-
-            if (it.equals(currentStage)) {
-                int currentStageIndex = getStageIndex(currentStage);
-
-                currentUserProgress = new UserProgress(currentUser.getId(), currentCategory.getId());
-                currentUserProgress.setReachedStage(currentStageIndex + 1);
-
-                db.processObject(s -> s.save(currentUserProgress));
-
-                StageAttempts sa = new StageAttempts(currentStage.getId(),
-                        currentUser.getId(), currentCategory.getId());
-                sa.setAttempts(10 - currentStageIndex);
-
-                db.processObject(s -> s.update(sa));
-
-                currentStage = it.next(); //should be setting to null
-                currentStage.setUnlocked(true); //should be the object from the list of stages,
-                //not setting the current stage
-                break;
-            }
+            db.processObject(s -> s.update(sa));
         }
     }
 
