@@ -2,19 +2,20 @@ package org.elsys.netprog;
 
 import org.elsys.netprog.model.User;
 import org.elsys.netprog.view.JsonWrapper;
+import org.json.JSONObject;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.POST;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -48,10 +49,11 @@ public class HelloWorld {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getHelloWorld(User user) {
-
+    public Response getHelloWorld(String request) {
+        JSONObject parsed = new JSONObject(request);
+        User user = new User(parsed.getInt("id"), parsed.getString("username"), parsed.getString("password"));
         return Response.ok().entity(user.toString()).build();
     }
 
