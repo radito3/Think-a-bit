@@ -1,12 +1,22 @@
 import React from "react";
 import { Redirect, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import { GridList, RaisedButton } from "material-ui";
+import {
+    CircularProgress,
+    GridList,
+    RaisedButton
+} from "material-ui";
 import StarBorder from "material-ui/svg-icons/toggle/star-border";
+import { selectCategory } from "../store/actions/stages";
 
 class CategoriesPage extends React.Component {
     constructor(props) {
         super(props);
+    }
+
+    handleCategoryClick(categoryId) {
+        this.props.selectCategory(categoryId);
+        this.props.history.push("/stages");
     }
 
     render() {
@@ -22,29 +32,36 @@ class CategoriesPage extends React.Component {
             }
         };
 
+        const categories = this.props.categories.length > 0 ?
+            <div>
+                <h1>Select a category</h1>
+                <GridList
+                    cellHeight={180}
+                    cols={4}
+                    padding={8}
+                >
+                    {this.props.categories.map(category => (
+                        <RaisedButton
+                            key={category.id}
+                            buttonStyle={{
+                                "fontSize": "20px",
+                                "textAlign": "center",
+                                "margin": "auto"
+                            }}
+                            style={{
+                                "height": "100%",
+                                "width": "100%"
+                            }}
+                            onClick={() => this.handleCategoryClick.bind(this, category.id)()}
+                        >{category.name}
+                        </RaisedButton>
+                    ))}
+                </GridList>
+            </div> :
+            <CircularProgress size={80} thickness={5} />;
+
         return <div style={styles.root}>
-            <h1>Select a category</h1>
-            <GridList
-                cellHeight={180}
-                cols={4}
-                padding={8}
-            >
-                {this.props.categories.map(category => (
-                    <RaisedButton
-                    key={category}
-                        buttonStyle={{
-                            "fontSize": "20px",
-                            "textAlign": "center",
-                            "margin": "auto"
-                        }}
-                        style={{
-                            "height": "100%",
-                            "width": "100%"
-                        }}
-                    >{category}
-                    </RaisedButton>
-                ))}
-            </GridList>
+            {categories}
         </div>;
     }
 }
@@ -54,4 +71,4 @@ export default withRouter(connect(store => {
         categories: store.categories.categories,
         authentication: store.authentication
     };
-})(CategoriesPage));
+}, { selectCategory })(CategoriesPage));

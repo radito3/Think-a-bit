@@ -8,6 +8,7 @@ import {
     Subheader,
 } from "material-ui";
 import { addCategories, removeCategories } from "../store/actions/categories";
+import { selectCategory } from "../store/actions/stages";
 import { logout } from "../store/actions/authentication";
 import config from "../config.json";
 
@@ -20,16 +21,24 @@ class SideMenuOptions extends React.Component {
         fetch(`${config.url}:${config.port}/Think-a-bit/game`).then(response => {
             return response.json();
         }).then(parsed => {
-            this.props.addCategories(parsed.map(category => category.name));
+            this.props.addCategories(parsed);
         }).catch(error => {
             console.log(error);
         });
     }
 
+    handleCategoryClick(categoryId) {
+        this.props.selectCategory(categoryId);
+        this.props.history.push("/stages");
+    }
+
     render() {
         const categories = this.props.categories.length > 0 ?
             this.props.categories.map(category =>
-                <MenuItem key={category}>{category}</MenuItem>
+                <MenuItem
+                    key={category.id}
+                    onClick={() => this.handleCategoryClick.bind(this, category.id)()}
+                >{category.name}</MenuItem>
             ) :
             <CircularProgress size={80} thickness={5} />;
 
@@ -56,4 +65,9 @@ export default withRouter(connect(store => {
         authentication: store.authentication,
         categories: store.categories.categories
     };
-}, { addCategories, removeCategories, logout })(SideMenuOptions));
+}, {
+    addCategories,
+    removeCategories,
+    selectCategory,
+    logout
+})(SideMenuOptions));
