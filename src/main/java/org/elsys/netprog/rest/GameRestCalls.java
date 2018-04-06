@@ -70,9 +70,23 @@ public class GameRestCalls {
             System.err.println(e.getMessage());
             return Response.status(500).build();
         } catch (IllegalStateException e) {
-            return Response.status(400).entity("\"msg\":\"" + e.getMessage() + "\"").build();
+            return Response.status(403).entity("\"msg\":\"" + e.getMessage() + "\"").build();
         }
 
         return Response.status(200).entity(output).build();
+    }
+
+    @GET
+    @Path("/buyStageAttempts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response buyStageAttempts(@DefaultValue("1") @QueryParam("stageId") int stageId) {
+
+        try {
+            game.buyAttempts(stageId);
+        } catch (IllegalAccessException e) {
+            return Response.status(403).entity("\"msg\":\"" + e.getMessage() + "\"").build();
+        }
+
+        return Response.status(200).build();
     }
 }

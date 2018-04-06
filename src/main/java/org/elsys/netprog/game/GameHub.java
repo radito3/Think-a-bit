@@ -24,6 +24,11 @@ public class GameHub extends AbstractGame implements Game {
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
     }
 
+    /**
+     * Get the Singleton instance.
+     *
+     * @return The instance
+     */
     public static GameHub getInstance() {
         if (instance == null) {
             instance = new GameHub();
@@ -42,32 +47,28 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public List<Question> playStage(int stageId) {
+    public List<Question> playStage(int stageId) { //need to revise
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
         StageAttempts sa = new StageAttempts(currentStage == null ? stage.getId() : currentStage.getId(),
-                currrentUser.getId(), currentCategory.getId());
+                currentUser.getId(), currentCategory.getId());
 
-        if (currentCategory.getStages().get(0).equals(stage)) {
-            currentStage = stage;
-            currentStage.setUnlocked(true);
-            currentCategory.getStages().get(getStageIndex(stage)).setUnlocked(true);
+        if (!stage.isUnlocked()) {
+            setCurrentStage(stage);
 
-            sa.setAttempts(10);
-            db.processObject(s -> s.save(sa));
-            setStageQuestions();
-
-            return currentStage.getQuestions();
-        } else if (!stage.isUnlocked()) {
-            throw new IllegalStateException("Stage is locked");
-        } else {
-            currentStage = stage;
-
-            sa.setAttempts(10 - getStageIndex(stage));
+            sa.setAttempts(10 - getStageIndex(stage)); //default stage attempts for 1st stage are 10
             db.processObject(s -> s.update(sa));
             setStageQuestions();
 
             return currentStage.getQuestions();
+        } else {
+            throw new IllegalStateException("Stage is locked");
         }
+    }
+
+    private void setCurrentStage(Stages stage) {
+        currentStage = stage;
+        currentStage.setUnlocked(true);
+        currentCategory.getStages().get(getStageIndex(stage)).setUnlocked(true);
     }
 
     private void setStageQuestions() {
@@ -88,25 +89,30 @@ public class GameHub extends AbstractGame implements Game {
         if (currentStage.getQuestions().stream().allMatch(Question::isSolved)) {
             currentStage.setUnlocked(false);
             currentStage.setTimeout(180);
+        } else {
+            //TODO lower StageAttempts by 1
         }
 
         for (Iterator<Stages> it = currentCategory.getStages().iterator(); it.hasNext();) {
+            //this needn't be done with iterating through the stages, it could be from just getting the stage
+
             if (it.equals(currentStage)) {
                 int currentStageIndex = getStageIndex(currentStage);
 
-                currentUserProgress = new UserProgress(currrentUser.getId(), currentCategory.getId());
+                currentUserProgress = new UserProgress(currentUser.getId(), currentCategory.getId());
                 currentUserProgress.setReachedStage(currentStageIndex + 1);
 
                 db.processObject(s -> s.save(currentUserProgress));
 
                 StageAttempts sa = new StageAttempts(currentStage.getId(),
-                        currrentUser.getId(), currentCategory.getId());
+                        currentUser.getId(), currentCategory.getId());
                 sa.setAttempts(10 - currentStageIndex);
 
                 db.processObject(s -> s.update(sa));
 
-                currentStage = it.next();
-                currentStage.setUnlocked(true);
+                currentStage = it.next(); //should be setting to null
+                currentStage.setUnlocked(true); //should be the object from the list of stages,
+                //not setting the current stage
                 break;
             }
         }
@@ -150,5 +156,20 @@ public class GameHub extends AbstractGame implements Game {
         currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
         db.processObject(s -> s.update(currentStageAttempts));
         return false;
+    }
+
+    @Override
+    public void buyAttempts(int stageId) throws IllegalAccessException {
+        Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
+        StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
+                new StageAttempts(stageId, currentUser.getId(), currentCategory.getId())));
+        UserProgress up = new UserProgress(currentUser.getId(), currentCategory.getId());
+
+        if (up.getReachedStage() < (getStageIndex(stage) + 1)) { //check if stage is unlocked
+            throw new IllegalAccessException("Stage not unlocked");
+        }
+
+        sa.setAttempts(10 - getStageIndex(stage));
+        db.processObject(s -> s.update(sa));
     }
 }

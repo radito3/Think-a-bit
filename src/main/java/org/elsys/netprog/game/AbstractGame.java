@@ -15,7 +15,7 @@ public abstract class AbstractGame implements Game {
 
     Categories currentCategory;
 
-    User currrentUser;
+    User currentUser;
 
     Stages currentStage;
 
@@ -37,8 +37,8 @@ public abstract class AbstractGame implements Game {
         return currentCategory;
     }
 
-    public User getCurrrentUser() {
-        return currrentUser;
+    public User getCurrentUser() {
+        return currentUser;
     }
 
     public Stages getCurrentStage() {

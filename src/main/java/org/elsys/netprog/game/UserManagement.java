@@ -24,7 +24,7 @@ public class UserManagement extends AbstractGame implements UserOperations {
             throw new IllegalAccessException("No such user"); //or more than 1 user with same credentials
         }
 
-        currrentUser = user;
+        currentUser = user;
 
         return user;
     }
@@ -33,12 +33,12 @@ public class UserManagement extends AbstractGame implements UserOperations {
     public void register(String userName, String password) {
         User user = new User(userName, cryptWithMD5(password));
         db.processObject(s -> s.save(user));
-        currrentUser = user;
+        currentUser = user;
     }
 
     @Override
     public void logout() {
-        currrentUser = null;
+        currentUser = null;
     }
 
     @Override
