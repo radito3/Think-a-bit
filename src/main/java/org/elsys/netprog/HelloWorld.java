@@ -40,6 +40,7 @@ public class HelloWorld {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
+            connection.setDoInput(true);
 
             String str = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                     "<user>\n" +
@@ -51,8 +52,7 @@ public class HelloWorld {
             byte[] value = str.getBytes(StandardCharsets.UTF_8);
 
             connection.setFixedLengthStreamingMode(value.length);
-            connection.setRequestProperty("Content-Type",
-                    "application/xml; charset=UTF-8");
+            connection.setRequestProperty("Content-Type", "application/xml; charset=UTF-8");
 
             connection.connect();
 
@@ -60,7 +60,8 @@ public class HelloWorld {
                 os.write(value);
             }
 
-            try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            InputStream is = connection.getInputStream();
+            try (BufferedReader rd = new BufferedReader(new InputStreamReader(is))) {
                 String line;
                 while ((line = rd.readLine()) != null) {
                     response.append(line).append('\n');
