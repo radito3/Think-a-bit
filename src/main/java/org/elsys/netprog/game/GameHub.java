@@ -3,7 +3,6 @@ package org.elsys.netprog.game;
 import org.elsys.netprog.model.*;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -60,7 +59,7 @@ public class GameHub extends AbstractGame implements Game {
             currentStage = stage;
 
             sa.setAttempts(10 - getStageIndex(stage)); //default stage attempts for 1st stage are 10
-            db.processObject(s -> s.update(sa));
+            db.processObject(s -> s.saveOrUpdate(sa));
             setStageQuestions();
 
             return this;
@@ -86,7 +85,7 @@ public class GameHub extends AbstractGame implements Game {
     public void checkIfCurrentStageIsComplete() {
         if (currentStage.getQuestions().stream().allMatch(Question::isSolved)) {
             currentStage.setUnlocked(false); //these operations modify the object in currentCategory::stages
-            currentStage.setTimeout(180);
+            currentStage.setTimeout(180); //this stage will be unlocked again in 180 seconds
 
             int currentStageIndex = getStageIndex(currentStage);
 
