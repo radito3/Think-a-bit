@@ -20,12 +20,33 @@ import java.nio.charset.StandardCharsets;
 @Path("/test")
 public class HelloWorld {
 
+    private interface ITest {
+        default int testMethod(int i) {
+            return i*2;
+        }
+    }
+
+    private class Test implements ITest {
+        @Override
+        public int testMethod(int i) {
+            return i*3;
+        }
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.TEXT_PLAIN)
     public Response getHelloWorld(User user) {
 
         return Response.ok().entity(user.toString()).build();
+    }
+
+    @GET
+    @Path("/2")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response testDefaultMethodOverriding() {
+        ITest test = new Test();
+        return Response.status(200).entity(String.valueOf(test.testMethod(2))).build();
     }
 
     @GET
