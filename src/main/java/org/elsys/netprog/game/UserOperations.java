@@ -6,9 +6,11 @@ public interface UserOperations {
 
     void register(String userName, String password);
 
-    User login(String userName, String password) throws IllegalAccessException;
+    void login(String userName, String password) throws IllegalAccessException;
 
     void logout();
 
     User getUser(int id);
+
+    User getCurrentUser();
 }

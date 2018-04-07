@@ -37,20 +37,8 @@ public abstract class AbstractGame implements Game {
         return currentCategory;
     }
 
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
     @Override
     public Stages getCurrentStage() {
         return currentStage;
-    }
-
-    public UserProgress getCurrentUserProgress() {
-        return currentUserProgress;
-    }
-
-    public StageAttempts getCurrentStageAttempts() {
-        return currentStageAttempts;
     }
 }

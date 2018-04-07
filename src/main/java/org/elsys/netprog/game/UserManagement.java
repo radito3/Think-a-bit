@@ -12,7 +12,7 @@ public class UserManagement extends AbstractGame implements UserOperations {
     }
 
     @Override
-    public User login(String userName, String password) throws IllegalAccessException {
+    public void login(String userName, String password) throws IllegalAccessException {
         User user;
         String encryptedPass = cryptWithMD5(password);
 
@@ -25,8 +25,6 @@ public class UserManagement extends AbstractGame implements UserOperations {
         }
 
         currentUser = user;
-
-        return user;
     }
 
     @Override
@@ -44,6 +42,11 @@ public class UserManagement extends AbstractGame implements UserOperations {
     @Override
     public User getUser(int id) {
         return db.getObject(s -> s.get(User.class, id));
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return currentUser;
     }
 
 //    public void update() {

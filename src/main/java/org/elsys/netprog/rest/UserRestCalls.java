@@ -3,6 +3,7 @@ package org.elsys.netprog.rest;
 import org.elsys.netprog.game.UserManagement;
 import org.elsys.netprog.model.User;
 import org.elsys.netprog.view.JsonWrapper;
+import org.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -17,6 +18,7 @@ public class UserRestCalls {
 
     @GET
     @Path("/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("userId") int id) { //not sure if needed
         User user = users.getUser(id);
         String output;
@@ -31,9 +33,35 @@ public class UserRestCalls {
         return Response.ok().entity(output).build();
     }
 
+    @GET
+    @Path("/currentUser")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCurrentUser() {
+        String output;
+
+        try {
+            output = JsonWrapper.getJsonFromObject(users.getCurrentUser());
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return Response.status(500).build();
+        }
+
+        return Response.status(200).entity(output).build();
+    }
+
     @POST
     @Path("/login")
-    public Response login(@CookieParam("user") String user) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response login(String request) {
+        JSONObject userData = new JSONObject(request);
+
+        try {
+            users.login(userData.getString("username"),
+                    userData.getString("password"));
+        } catch (IllegalAccessException e) {
+            System.err.println(e.getMessage());
+            return Response.status(500).build();
+        }
 
         return Response.status(200).build();
     }
@@ -41,10 +69,14 @@ public class UserRestCalls {
     @POST
     @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(User user) {
+    public Response createUser(String request) {
+        JSONObject userData = new JSONObject(request);
+        users.register(userData.getString("username"),
+                userData.getString("password"));
+        User current = users.getCurrentUser();
 
         return Response.status(201)
-                .cookie(new NewCookie("newUserId", String.valueOf(user.getId())))
+                .cookie(new NewCookie("currentUserId", String.valueOf(current.getId())))
                 .build();
     }
 
