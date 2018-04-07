@@ -40,7 +40,7 @@ public class UserRestCalls {
 
     @POST
     @Path("/create")
-    @Consumes({ MediaType.APPLICATION_XML })
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response createUser(User user) {
 
         return Response.status(201)

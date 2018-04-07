@@ -82,7 +82,7 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public void checkIfCurrentStageIsComplete() {
+    public boolean checkIfCurrentStageIsComplete() {
         if (currentStage.getQuestions().stream().allMatch(Question::isSolved)) {
             currentStage.setUnlocked(false); //these operations modify the object in currentCategory::stages
             currentStage.setTimeout(180); //this stage will be unlocked again in 180 seconds
@@ -102,17 +102,21 @@ public class GameHub extends AbstractGame implements Game {
 
             currentCategory.getStages().get(currentStageIndex + 1).setUnlocked(true);
             currentStage = null;
+
+            return true;
         } else {
             StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                     new StageAttempts(currentStage.getId(), currentUser.getId(), currentCategory.getId())));
             sa.setAttempts(sa.getAttempts() - 1);
 
             db.processObject(s -> s.update(sa));
+
+            return false;
         }
     }
 
     @Override
-    public boolean answerQuestion(Question question, String... answers) {
+    public void answerQuestion(Question question, String... answers) {
         if (question.getType() == Question.Type.CLOSED_MANY) {
             Stream<Answers> correct = db.getObject(s ->
                     s.createQuery(getCorrectAnswerQuery(question)).getResultStream());
@@ -120,35 +124,26 @@ public class GameHub extends AbstractGame implements Game {
             Stream<String> allAnswers = Stream.concat(correct.map(Answers::getPayload), Arrays.stream(answers));
 
             if (allAnswers.reduce((a, b) -> a.equals(b) ? "" : a).get().length() == 0) {
-                return correctAnswer(question);
+                currentStage.getQuestions().get(currentStage.getQuestions().indexOf(question)).setSolved(true);
             } else {
-                return wrongAnswer();
+                currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
+                db.processObject(s -> s.update(currentStageAttempts));
             }
         } else {
             Answers correct = (Answers) db.getObject(s ->
                     s.createQuery(getCorrectAnswerQuery(question)).uniqueResult());
 
             if (correct.getPayload().equals(answers[0])) {
-                return correctAnswer(question);
+                currentStage.getQuestions().get(currentStage.getQuestions().indexOf(question)).setSolved(true);
             } else {
-                return wrongAnswer();
+                currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
+                db.processObject(s -> s.update(currentStageAttempts));
             }
         }
     }
 
     private String getCorrectAnswerQuery(Question question) {
         return "FROM Answers WHERE QuestionId = " + question.getId() + " AND IsCorrect = true";
-    }
-
-    private boolean correctAnswer(Question question) {
-        currentStage.getQuestions().get(currentStage.getQuestions().indexOf(question)).setSolved(true);
-        return true;
-    }
-
-    private boolean wrongAnswer() {
-        currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
-        db.processObject(s -> s.update(currentStageAttempts));
-        return false;
     }
 
     @Override
@@ -159,7 +154,7 @@ public class GameHub extends AbstractGame implements Game {
         UserProgress up = new UserProgress(currentUser.getId(), currentCategory.getId());
 
         if (up.getReachedStage() < (getStageIndex(stage) + 1)) { //check if stage is unlocked
-            throw new IllegalAccessException("Stage not unlocked");
+            throw new IllegalAccessException("Stage is locked");
         }
 
         sa.setAttempts(10 - getStageIndex(stage));

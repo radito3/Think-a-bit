@@ -6,11 +6,14 @@ import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
 import org.elsys.netprog.model.Stages;
 import org.elsys.netprog.view.JsonWrapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 @Path("/game")
@@ -92,10 +95,44 @@ public class GameRestCalls {
 
     @POST
     @Path("/stage")
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response submitAnswers() {
+    public Response submitAnswers(String request) {
+        JSONArray qAndA = new JSONObject(request).getJSONArray("form");
+        List<JSONObject> entities = new LinkedList<>();
 
-        return Response.status(200).build();
+        for (Object entity : qAndA) {
+            entities.add(new JSONObject(entity));
+        }
+
+        entities.forEach(ent -> {
+            Question question = new Question(ent.getInt("questionId"),
+                    Question.Type.valueOf(ent.getString("questionType")),
+                    ent.getString("questionTitle"));
+            List<Object> answers = ent.getJSONArray("answers").toList();
+            String[] answ = (String[]) answers.toArray();
+            game.answerQuestion(question, answ);
+        });
+
+        boolean solvedStage = game.checkIfCurrentStageIsComplete();
+        String[] wrongQuestionTitles = (String[]) game.getCurrentStage().getQuestions()
+                .stream()
+                .filter(q -> !q.isSolved())
+                .map(Question::getTitle)
+                .toArray();
+        String output;
+
+        if (solvedStage) {
+            output = "{\"wrongQuestions\":[]}";
+        } else {
+            try {
+                output = "{\"wrongQuestions\":" + JsonWrapper.getJsonFromObject(wrongQuestionTitles) + "}";
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+                return Response.status(500).build();
+            }
+        }
+
+        return Response.status(200).entity(output).build();
     }
 }

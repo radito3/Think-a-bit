@@ -2,6 +2,7 @@ package org.elsys.netprog.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "Question")
@@ -63,5 +64,20 @@ public class Question implements Serializable {
 
     public void setSolved(boolean solved) {
         isSolved = solved;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Question question = (Question) object;
+        return Id == question.Id &&
+                Type == question.Type &&
+                Objects.equals(Title, question.Title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Id, Type, Title);
     }
 }

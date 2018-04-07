@@ -57,19 +57,20 @@ public interface Game {
 
     /**
      * Check for current stage completion
+     *
+     * @return {@code true} if the stage is complete, {@code false} otherwise
      */
-    default void checkIfCurrentStageIsComplete() {}
+    default boolean checkIfCurrentStageIsComplete() {
+        return false;
+    }
 
     /**
      * Answer a given question.
      *
      * @param question The Question needed to checked for answering
      * @param answers A variable amount of answers, depending on the Question Type
-     * @return {@code true} if the answer(s) is correct, {@code false} otherwise
      */
-    default boolean answerQuestion(Question question, String... answers) {
-        return false;
-    }
+    default void answerQuestion(Question question, String... answers) {}
 
     /**
      * Add attempts to a Stage identified by given stage Id.

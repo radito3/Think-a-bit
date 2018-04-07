@@ -7,33 +7,24 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "Users")
-@XmlRootElement(name = "user")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "mysql->int(11)", name = "Id", nullable = false, unique = true)
     @NotNull
-    @XmlElement(name = "id")
     private int Id;
 
     @Column(columnDefinition = "mysql->varchar(64)", name = "UserName", nullable = false)
-    @XmlElement(name = "username")
     private String UserName;
 
     @Column(columnDefinition = "mysql->text", name = "Pass", nullable = false)
-    @XmlElement(name = "password")
     private String Password;
 
     public User() {}

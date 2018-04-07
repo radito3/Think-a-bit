@@ -53,7 +53,10 @@ public class HelloWorld {
     @Produces(MediaType.TEXT_PLAIN)
     public Response getHelloWorld(String request) {
         JSONObject parsed = new JSONObject(request);
-        User user = new User(parsed.getInt("id"), parsed.getString("username"), parsed.getString("password"));
+        User user = new User(parsed.getInt("id"),
+                parsed.getString("username"),
+                parsed.getString("password"));
+
         return Response.ok().entity(user.toString()).build();
     }
 
@@ -76,6 +79,18 @@ public class HelloWorld {
     }
 
     @GET
+    @Path("/4")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response testJsonArrayParsing() throws IOException {
+        String[] array = new String[2];
+        array[0] = "one";
+        array[1] = "two";
+        String str = JsonWrapper.getJsonFromObject(array);
+
+        return Response.status(200).entity(str).build();
+    }
+
+    @GET
     @Path("/1")
     @Produces(MediaType.TEXT_PLAIN)
     public Response test() {
@@ -89,17 +104,18 @@ public class HelloWorld {
             connection.setDoOutput(true);
             connection.setDoInput(true);
 
-            String str = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+            String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                     "<user>\n" +
                     "    <id>1</id>\n" +
                     "    <username>test</username>\n" +
                     "    <password>testp</password>\n" +
                     "</user>";
+            String json = "{\"id\":1,\"username\":\"test\",\"password\":\"testp\"}";
 
-            byte[] value = str.getBytes(StandardCharsets.UTF_8);
+            byte[] value = json.getBytes(StandardCharsets.UTF_8);
 
             connection.setFixedLengthStreamingMode(value.length);
-            connection.setRequestProperty("Content-Type", "application/xml; charset=UTF-8");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
             connection.connect();
 
