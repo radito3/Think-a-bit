@@ -1,6 +1,7 @@
 package org.elsys.netprog.rest;
 
 import org.elsys.netprog.game.UserManagement;
+import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
 import org.elsys.netprog.view.JsonWrapper;
 import org.json.JSONObject;
@@ -36,7 +37,7 @@ public class UserRestCalls {
                 Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000)));
 
         return Response.status(200)
-                .cookie(new NewCookie("sessionId", session.getSessionId()))
+                .cookie(new NewCookie("sessionId", String.valueOf(session.getSessionId())))
                 .build();
     }
 
@@ -51,7 +52,7 @@ public class UserRestCalls {
                 Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000)));
 
         return Response.status(201)
-                .cookie(new NewCookie("sessionId", session.getSessionId()))
+                .cookie(new NewCookie("sessionId", String.valueOf(session.getSessionId())))
                 .build();
     }
 

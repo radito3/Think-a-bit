@@ -17,18 +17,18 @@ public class Sessions implements Serializable {
     private int UserId;
 
     @Id
-    @Column(columnDefinition = "mysql->int(11)", name = "SessionId", nullable = false)
-    private int SessionId;
+    @Column(columnDefinition = "mysql->bigint(20)", name = "SessionId", nullable = false)
+    private long SessionId;
 
-    @Column(columnDefinition = "mysql->timestamp", name = "CreatedAt", nullable = false)
+    @Column(columnDefinition = "mysql->timestamp", name = "CreatedAt")
     private Timestamp CreatedAt;
 
-    @Column(columnDefinition = "mysql->timestamp", name = "ExpiresAt", nullable = false)
+    @Column(columnDefinition = "mysql->timestamp", name = "ExpiresAt")
     private Timestamp ExpiresAt;
 
     public Sessions() {}
 
-    public Sessions(int userId, int sessionId, Timestamp createdAt, Timestamp expiresAt) {
+    public Sessions(int userId, long sessionId, Timestamp createdAt, Timestamp expiresAt) {
         this.UserId = userId;
         this.SessionId = sessionId;
         this.CreatedAt = createdAt;
@@ -43,11 +43,11 @@ public class Sessions implements Serializable {
         UserId = userId;
     }
 
-    public int getSessionId() {
+    public long getSessionId() {
         return SessionId;
     }
 
-    public void setSessionId(int sessionId) {
+    public void setSessionId(long sessionId) {
         SessionId = sessionId;
     }
 
@@ -80,7 +80,6 @@ public class Sessions implements Serializable {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(UserId, SessionId, CreatedAt, ExpiresAt);
     }
 }

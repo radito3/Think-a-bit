@@ -1,6 +1,7 @@
 package org.elsys.netprog.game;
 
 import org.elsys.netprog.db.DatabaseUtil;
+import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
 
 import java.security.MessageDigest;
@@ -40,7 +41,8 @@ public class UserManagement extends AbstractGame implements UserOperations {
 
     @Override
     public void deleteSessionData(int sessionId) {
-        db.processObject(s -> s.delete(new Sessions(sessionId)));
+        Sessions session = db.getObject(s -> s.get(Sessions.class, sessionId));
+        db.processObject(s -> s.delete(session));
     }
 
     @Override
