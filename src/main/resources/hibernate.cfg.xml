@@ -38,6 +38,7 @@
         <mapping resource = "StageAttempts.hbm.xml"/>
         <mapping resource = "Answers.hbm.xml"/>
         <mapping resource = "QuestionStages.hbm.xml"/>
+        <mapping resource = "Sessions.hbm.xml" />
 
     </session-factory>
 </hibernate-configuration>

@@ -74,3 +74,13 @@ CREATE TABLE QuestionStages (
   FOREIGN KEY (QuestionId) REFERENCES Question(Id),
   FOREIGN KEY (StageId) REFERENCES Stages(Id)
 );
+
+CREATE TABLE Sessions (
+  UserId INTEGER NOT NULL,
+  SessionId INTEGER NOT NULL,
+  CreatedAt TIMESTAMP NULL DEFAULT NULL,
+  ExpiresAt TIMESTAMP NULL DEFAULT NULL,
+
+  PRIMARY KEY (UserId, SessionId),
+  FOREIGN KEY (UserId) REFERENCES Users(Id)
+);

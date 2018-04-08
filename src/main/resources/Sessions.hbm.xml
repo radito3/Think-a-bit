@@ -1,0 +1,21 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name = "org.elsys.netprog.model.Sessions" table = "Sessions">
+
+        <meta attribute = "class-description">
+            This class contains users' sessions.
+        </meta>
+
+        <composite-id>
+            <key-property name = "UserId" type = "int" column = "UserId" />
+            <key-property name = "SessionId" type = "int" column = "SessionId" />
+        </composite-id>
+        <property name = "CreatedAt" type = "timestamp" column = "CreatedAt" />
+        <property name = "ExpiresAt" type = "timestamp" column = "UpdatedAt" />
+
+    </class>
+</hibernate-mapping>
