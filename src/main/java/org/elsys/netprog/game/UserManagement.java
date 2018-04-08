@@ -1,5 +1,6 @@
 package org.elsys.netprog.game;
 
+import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.User;
 
 import java.security.MessageDigest;
@@ -7,12 +8,14 @@ import java.security.NoSuchAlgorithmException;
 
 public class UserManagement extends AbstractGame implements UserOperations {
 
+    private final DatabaseUtil db;
+
     public UserManagement() {
-        super();
+        db = DatabaseUtil.getInstance();
     }
 
     @Override
-    public void login(String userName, String password) throws IllegalAccessException {
+    public User login(String userName, String password) throws IllegalAccessException {
         User user;
         String encryptedPass = cryptWithMD5(password);
 
@@ -24,14 +27,20 @@ public class UserManagement extends AbstractGame implements UserOperations {
             throw new IllegalAccessException("No such user"); //or more than 1 user with same credentials
         }
 
-        currentUser = user;
+        return user;
     }
 
     @Override
-    public void register(String userName, String password) {
+    public User register(String userName, String password) {
         User user = new User(userName, cryptWithMD5(password));
         db.processObject(s -> s.save(user));
-        currentUser = user;
+
+        return user;
+    }
+
+    @Override
+    public void deleteSessionData(int sessionId) {
+        db.processObject(s -> s.delete(new Sessions(sessionId)));
     }
 
     @Override
@@ -40,22 +49,21 @@ public class UserManagement extends AbstractGame implements UserOperations {
     }
 
     @Override
-    public User getUser(int id) {
-        return db.getObject(s -> s.get(User.class, id));
+    public void update(int id, String userName, String password) {
+        User user = new User(id, userName, cryptWithMD5(password));
+        try {
+            db.getObject(s -> s.get(User.class, id));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("User does not exist");
+        }
+        db.processObject(s -> s.update(user));
     }
 
     @Override
-    public User getCurrentUser() {
-        return currentUser;
+    public void delete(int userId, String userName, String password) {
+        User user = new User(userId, userName, cryptWithMD5(password));
+        db.processObject(s -> s.delete(user));
     }
-
-//    public void update() {
-//
-//    }
-//
-//    public void delete() {
-//
-//    }
 
     private static String cryptWithMD5(String pass) {
         try {

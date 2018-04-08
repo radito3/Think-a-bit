@@ -1,17 +1,12 @@
 package org.elsys.netprog.game;
 
-import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.*;
 
 import java.util.List;
 
 public abstract class AbstractGame implements Game {
 
-    /**all game variables*/
-
-    protected List<Categories> categories;
-
-    protected final DatabaseUtil db;
+//    protected List<Categories> categories;
 
     Categories currentCategory;
 
@@ -23,14 +18,8 @@ public abstract class AbstractGame implements Game {
 
     StageAttempts currentStageAttempts;
 
-    AbstractGame() {
-        db = DatabaseUtil.getInstance();
-    }
-
-    /**these are to be used when building the json models for React rendering*/
-
-    @Override
-    public List<Categories> getCategories() { return categories; }
+//    @Override
+//    public List<Categories> getCategories() { return categories; }
 
     @Override
     public Categories getCurrentCategory() {

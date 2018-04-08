@@ -1,5 +1,6 @@
 package org.elsys.netprog.game;
 
+import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.*;
 
 import java.util.Arrays;
@@ -17,8 +18,13 @@ public class GameHub extends AbstractGame implements Game {
 
     private static GameHub instance;
 
+    private final DatabaseUtil db;
+
+    private List<Categories> categories;
+
     private GameHub() {
-        super();
+        db = DatabaseUtil.getInstance();
+
         categories = IntStream.range(1, 10).mapToObj(i ->
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
     }
@@ -33,6 +39,11 @@ public class GameHub extends AbstractGame implements Game {
             instance = new GameHub();
         }
         return instance;
+    }
+
+    @Override
+    public List<Categories> getCategories() {
+        return categories;
     }
 
     @Override

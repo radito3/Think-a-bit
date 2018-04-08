@@ -10,60 +10,34 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.UUID;
 
 @Path("/users")
 public class UserRestCalls {
 
     private UserManagement users = new UserManagement();
 
-    @GET
-    @Path("/{userId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getUser(@PathParam("userId") int id) { //not sure if needed
-        User user = users.getUser(id);
-        String output;
-
-        try {
-            output = JsonWrapper.getJsonFromObject(user);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return Response.status(500).build();
-        }
-
-        return Response.ok().entity(output).build();
-    }
-
-    @GET
-    @Path("/currentUser")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCurrentUser() {
-        String output;
-
-        try {
-            output = JsonWrapper.getJsonFromObject(users.getCurrentUser());
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return Response.status(500).build();
-        }
-
-        return Response.status(200).entity(output).build();
-    }
-
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response login(String request) {
         JSONObject userData = new JSONObject(request);
-
+        User user;
         try {
-            users.login(userData.getString("username"),
+            user = users.login(userData.getString("username"),
                     userData.getString("password"));
         } catch (IllegalAccessException e) {
             System.err.println(e.getMessage());
             return Response.status(500).build();
         }
+        Sessions session = new Sessions(user.getId(), Long.valueOf(UUID.randomUUID().toString()),
+                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000)));
 
-        return Response.status(200).build();
+        return Response.status(200)
+                .cookie(new NewCookie("sessionId", session.getSessionId()))
+                .build();
     }
 
     @POST
@@ -71,38 +45,52 @@ public class UserRestCalls {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createUser(String request) {
         JSONObject userData = new JSONObject(request);
-        users.register(userData.getString("username"),
+        User user = users.register(userData.getString("username"),
                 userData.getString("password"));
-        User current = users.getCurrentUser();
+        Sessions session = new Sessions(user.getId(), Long.valueOf(UUID.randomUUID().toString()),
+                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000)));
 
         return Response.status(201)
-                .cookie(new NewCookie("currentUserId", String.valueOf(current.getId())))
+                .cookie(new NewCookie("sessionId", session.getSessionId()))
                 .build();
     }
 
     @GET
     @Path("/logout")
-    public Response logout() {
+    public Response logout(@CookieParam("sessionId") String sessionId) {
         users.logout();
+        users.deleteSessionData(Integer.valueOf(sessionId));
 
-        return Response.status(200).cookie(null).build();
+        return Response.status(200).cookie().build();
     }
 
-//    @POST
-//    @Path("/update")
-//    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response updateUser(User user) {
-//
-//        return Response.status(202).build();
-//    }
-//
-//    @DELETE
-//    @Path("/delete")
-//    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response deleteUser(User user) {
-//
-//        return Response.status(200).entity("{\"msg\":\"User deleted\"}").build();
-//    }
+    @POST
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateUser(String request) {
+        JSONObject json = new JSONObject(request);
+
+        try {
+            users.update(json.getInt("userId"),
+                    json.getString("userName"),
+                    json.getString("userPass"));
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return Response.status(500).build();
+        }
+
+        return Response.status(202).build();
+    }
+
+    @DELETE
+    @Path("/delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUser(String request) {
+        JSONObject json = new JSONObject(request);
+        users.delete(json.getInt("userId"),
+                json.getString("userName"),
+                json.getString("userPass"));
+
+        return Response.status(200).build();
+    }
 }
