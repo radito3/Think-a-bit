@@ -45,8 +45,8 @@ public class GameHub implements Game {
 
     @Override
     public List<Categories> getCategories() {
-        int categories = db.getObject(s ->
-                s.createQuery("SELECT COUNT(Categories.Id) FROM Categories").getFetchSize());
+        Integer categories = (Integer) db.getObject(s ->
+                s.createQuery("SELECT COUNT(Categories.Id) FROM Categories").uniqueResult());
         return IntStream.rangeClosed(1, categories).mapToObj(i ->
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
     }
