@@ -10,11 +10,11 @@
             This class contains users' sessions.
         </meta>
 
-        <composite-id>
-            <key-property name = "UserId" type = "int" column = "UserId" />
-            <key-property name = "SessionId" type = "long" column = "SessionId" />
-        </composite-id>
+        <id name = "SessionId" type = "long" column = "SessionId" >
+            <generator class="native"/>
+        </id>
 
+        <property name = "UserId" type = "int" column = "UserId" />
         <property name = "CreatedAt" type = "timestamp" column = "CreatedAt" />
         <property name = "ExpiresAt" type = "timestamp" column = "ExpiresAt" />
 

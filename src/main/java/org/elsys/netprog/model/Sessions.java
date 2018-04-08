@@ -12,7 +12,6 @@ import java.util.Objects;
 @Table(name = "Sessions")
 public class Sessions implements Serializable {
 
-    @Id
     @Column(columnDefinition = "mysql->int(11)", name = "UserId", nullable = false)
     private int UserId;
 

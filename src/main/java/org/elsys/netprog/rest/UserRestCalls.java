@@ -62,38 +62,42 @@ public class UserRestCalls {
     @GET
     @Path("/logout")
     public Response logout(@CookieParam("sessionId") String sessionId) {
-        users.deleteSessionData(Integer.valueOf(sessionId));
-
-        return Response.status(200).cookie().build();
-    }
-
-    @POST
-    @Path("/update")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUser(String request) {
-        JSONObject json = new JSONObject(request);
-
-        try {
-            users.update(json.getInt("userId"),
-                    json.getString("userName"),
-                    json.getString("userPass"));
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-            return Response.status(500).build();
+        if (sessionId == null) { //or  is session has expired
+            return Response.status(401).build();
         }
 
-        return Response.status(202).build();
+        users.deleteSessionData(Integer.valueOf(sessionId));
+
+        return Response.status(204).cookie().build();
     }
 
-    @DELETE
-    @Path("/delete")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteUser(String request) {
-        JSONObject json = new JSONObject(request);
-        users.delete(json.getInt("userId"),
-                json.getString("userName"),
-                json.getString("userPass"));
-
-        return Response.status(200).build();
-    }
+//    @POST
+//    @Path("/update")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public Response updateUser(String request) {
+//        JSONObject json = new JSONObject(request);
+//
+//        try {
+//            users.update(json.getInt("userId"),
+//                    json.getString("userName"),
+//                    json.getString("userPass"));
+//        } catch (IllegalArgumentException e) {
+//            System.err.println(e.getMessage());
+//            return Response.status(500).build();
+//        }
+//
+//        return Response.status(202).build();
+//    }
+//
+//    @DELETE
+//    @Path("/delete")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public Response deleteUser(String request) {
+//        JSONObject json = new JSONObject(request);
+//        users.delete(json.getInt("userId"),
+//                json.getString("userName"),
+//                json.getString("userPass"));
+//
+//        return Response.status(200).build();
+//    }
 }

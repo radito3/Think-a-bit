@@ -78,7 +78,7 @@ public class GameRestCalls {
             System.err.println(e.getMessage());
             return Response.status(500).build();
         } catch (IllegalStateException e) {
-            return Response.status(403).entity("\"msg\":\"" + e.getMessage() + "\"").build();
+            return Response.status(403).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
         }
 
         return Response.status(200).entity(output).build();
@@ -88,18 +88,24 @@ public class GameRestCalls {
     @Path("/buyStageAttempts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response buyStageAttempts(String request, @DefaultValue("1") @QueryParam("stageId") int stageId) {
-        JSONObject json = new JSONObject(request);
-        int userId = json.getInt("userId");
-        int categoryId = json.getInt("categoryId");
-
-        try {
-            game.buyAttempts(stageId, userId, categoryId);
-        } catch (IllegalAccessException e) {
-            return Response.status(403).entity("\"msg\":\"" + e.getMessage() + "\"").build();
+    public Response buyStageAttempts(String request, @CookieParam("sessionId") String sessionId) {
+        if (sessionId == null) { //or is session has expired
+            return Response.status(401).build();
         }
 
-        return Response.status(200).build();
+        JSONObject json = new JSONObject(request);
+        int userId = game.getUserId(Integer.valueOf(sessionId));
+        int categoryId = json.getInt("categoryId");
+        int stageId = json.getInt("stageId");
+        int numAttempts;
+
+        try {
+            numAttempts = game.buyAttempts(stageId, userId, categoryId);
+        } catch (IllegalAccessException e) {
+            return Response.status(403).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
+        }
+
+        return Response.status(200).entity("{\"attempts\":\"" + numAttempts + "\"}").build();
     }
 
     @POST

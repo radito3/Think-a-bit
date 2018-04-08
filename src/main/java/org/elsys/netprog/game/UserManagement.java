@@ -45,22 +45,22 @@ public class UserManagement implements UserOperations {
         db.processObject(s -> s.delete(session));
     }
 
-    @Override
-    public void update(int id, String userName, String password) {
-        User user = new User(id, userName, cryptWithMD5(password));
-        try {
-            db.getObject(s -> s.get(User.class, id));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("User does not exist");
-        }
-        db.processObject(s -> s.update(user));
-    }
-
-    @Override
-    public void delete(int userId, String userName, String password) {
-        User user = new User(userId, userName, cryptWithMD5(password));
-        db.processObject(s -> s.delete(user));
-    }
+//    @Override
+//    public void update(int id, String userName, String password) {
+//        User user = new User(id, userName, cryptWithMD5(password));
+//        try {
+//            db.getObject(s -> s.get(User.class, id));
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException("User does not exist");
+//        }
+//        db.processObject(s -> s.update(user));
+//    }
+//
+//    @Override
+//    public void delete(int userId, String userName, String password) {
+//        User user = new User(userId, userName, cryptWithMD5(password));
+//        db.processObject(s -> s.delete(user));
+//    }
 
     private static String cryptWithMD5(String pass) {
         try {

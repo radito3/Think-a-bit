@@ -145,11 +145,11 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public void buyAttempts(int stageId, int userId, int categoryId) throws IllegalAccessException {
+    public int buyAttempts(int stageId, int userId, int categoryId) throws IllegalAccessException {
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
         StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                 new StageAttempts(stageId, userId, categoryId)));
-        UserProgress up = new UserProgress(userId, categoryId);
+        UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
 
         if (up.getReachedStage() < stage.getNumber()) { //check if stage is unlocked
             throw new IllegalAccessException("Stage is locked");
@@ -157,5 +157,7 @@ public class GameHub extends AbstractGame implements Game {
 
         sa.setAttempts(10 - stage.getNumber());
         db.processObject(s -> s.update(sa));
+
+        return 10 - stage.getNumber();
     }
 }

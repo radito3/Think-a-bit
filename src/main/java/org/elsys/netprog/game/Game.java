@@ -77,9 +77,12 @@ public interface Game {
      * @param stageId The Id of the current stage
      * @param userId The Id of the current user
      * @param categoryId The Id of the current category
+     * @return The number of attempts received
      * @throws IllegalAccessException If the Stage which is requested is locked
      */
-    default void buyAttempts(int stageId, int userId, int categoryId) throws IllegalAccessException {}
+    default int buyAttempts(int stageId, int userId, int categoryId) throws IllegalAccessException {
+        return 0;
+    }
 
     /**
      * Get the current user id.

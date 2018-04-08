@@ -10,7 +10,7 @@ public interface UserOperations {
 
     void deleteSessionData(int sessionId);
 
-    void update(int id, String userName, String password);
+//    void update(int id, String userName, String password);
 
-    void delete(int userId, String userName, String password);
+//    void delete(int userId, String userName, String password);
 }
