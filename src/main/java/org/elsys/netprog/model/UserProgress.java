@@ -67,8 +67,4 @@ public class UserProgress implements Serializable {
     public void setReachedStage(int reachedStage) {
         ReachedStage = reachedStage;
     }
-
-    public void incrementReachedStage() {
-        ReachedStage++;
-    }
 }

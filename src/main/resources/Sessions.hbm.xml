@@ -16,7 +16,7 @@
         </composite-id>
 
         <property name = "CreatedAt" type = "timestamp" column = "CreatedAt" />
-        <property name = "ExpiresAt" type = "timestamp" column = "UpdatedAt" />
+        <property name = "ExpiresAt" type = "timestamp" column = "ExpiresAt" />
 
     </class>
 </hibernate-mapping>

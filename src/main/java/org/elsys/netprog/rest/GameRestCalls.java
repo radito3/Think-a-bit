@@ -38,12 +38,10 @@ public class GameRestCalls {
 
     @GET
     @Path("/category/{categoryId}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCategory(String request, @PathParam("categoryId") int categoryId) {
-        JSONObject json = new JSONObject(request);
-
-        Categories category = game.playCategory(categoryId);
+    public Response getCategory(@PathParam("categoryId") int categoryId,
+                                @CookieParam("sessionId") String sessionId) {
+        Categories category = game.playCategory(categoryId, Integer.valueOf(sessionId));
         String output; //includes which stage is unlocked
 
         try {
@@ -60,14 +58,17 @@ public class GameRestCalls {
     @Path("/stage")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStageQuestions(String request, @DefaultValue("1") @QueryParam("stageId") int stageId) {
+    public Response getStageQuestions(String request,
+                                      @DefaultValue("1") @QueryParam("stageId") int stageId,
+                                      @CookieParam("sessionId") String sessionId) {
         JSONObject json = new JSONObject(request);
-        int userId = json.getInt("userId");
+        int userId = game.getUserId(Integer.valueOf(sessionId));
+        int categoryId = json.getInt("categoryId");
 
         String output;
         Stages stage = game.getCurrentStage() == null ||
                 game.getCurrentStage().getId() != stageId ?
-                game.playStage(stageId, userId).getCurrentStage() :
+                game.playStage(stageId, userId, categoryId).getCurrentStage() :
                 game.getCurrentStage();
         List<Question> questions = stage.getQuestions();
 
@@ -102,7 +103,7 @@ public class GameRestCalls {
     }
 
     @POST
-    @Path("/stage")
+    @Path("/submit")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response submitAnswers(String request, @CookieParam("sessionId") String sessionId) {
@@ -128,7 +129,7 @@ public class GameRestCalls {
         int stageId = json.getInt("stageId");
         boolean solvedStage = game.checkIfCurrentStageIsComplete(userId, categoryId, stageId);
 
-        String[] wrongQuestionTitles = (String[]) game.getCurrentStage().getQuestions()
+        String[] wrongQuestionTitles = (String[]) game.getCurrentStage().getQuestions() //this should not be with current stage
                 .stream()
                 .filter(q -> !q.isSolved())
                 .map(Question::getTitle)

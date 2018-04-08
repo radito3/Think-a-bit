@@ -43,25 +43,23 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public Categories playCategory(int categoryId) {
+    public Categories playCategory(int categoryId, int userId) {
         Categories category = db.getObject(s -> s.get(Categories.class, categoryId));
 
-        category.setStages(IntStream.range(1, 4).mapToObj(i -> //3 stages for 1st category (temporary)
-            db.getObject(s -> s.get(Stages.class, i))).collect(Collectors.toList()));
+        db.processObject(s -> s.save(new UserProgress(userId, category.getId())));
 
         return category;
     }
 
     @Override
-    public GameHub playStage(int stageId, int userId) {
+    public GameHub playStage(int stageId, int userId, int categoryId) {
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));/*currentCategory.getStages().stream()
                 .filter(s -> s.equals(new Stages(stageId, currentCategory.getId())))
                 .findAny().get();*/
-        StageAttempts sa = new StageAttempts(currentStage == null ? stage.getId() : currentStage.getId(),
-                userId, currentCategory.getId());
+        StageAttempts sa = new StageAttempts(stage.getId(), userId, categoryId);
 
         if (true) { //should check the user progress -> reached stage
-            currentStage = stage;
+            currentStage = stage; //should be removed
 
             sa.setAttempts(10 - stage.getNumber()); //default stage attempts for 1st stage are 10
             db.processObject(s -> s.saveOrUpdate(sa));
@@ -82,24 +80,18 @@ public class GameHub extends AbstractGame implements Game {
         currentStage.setQuestions(questions);
     }
 
-    private int getStageIndex(Stages stage) {
-        return currentCategory.getStages().indexOf(stage);
-    }
-
     @Override
     public boolean checkIfCurrentStageIsComplete(int userId, int categoryId, int stageId) {
         if (currentStage.getQuestions().stream().allMatch(Question::isSolved)) {
 //            currentStage.setTimeout(180); //set a variable to tell when this stage is available for playing again
 
-            int currentStageIndex = getStageIndex(currentStage);
+            UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId))); //this should be from request body
+            up.setReachedStage(up.getReachedStage() + 1);
 
-            currentUserProgress = new UserProgress(userId, categoryId); //this should be from request body
-            currentUserProgress.incrementReachedStage();
-
-            db.processObject(s -> s.save(currentUserProgress));
+            db.processObject(s -> s.update(currentUserProgress));
 
             StageAttempts sa = new StageAttempts(currentStage.getId(), userId, categoryId);
-            sa.setAttempts(10 - currentStageIndex);
+            sa.setAttempts(10 - currentStage.getNumber());
 
             db.processObject(s -> s.update(sa));
 
@@ -117,6 +109,10 @@ public class GameHub extends AbstractGame implements Game {
         }
     }
 
+    private int getQuestionIndex(Question question) {
+        return currentStage.getQuestions().indexOf(question);
+    }
+
     @Override
     public void answerQuestion(Question question, String... answers) {
         if (question.getType() == Question.Type.CLOSED_MANY) {
@@ -126,7 +122,7 @@ public class GameHub extends AbstractGame implements Game {
             Stream<String> allAnswers = Stream.concat(correct.map(Answers::getPayload), Arrays.stream(answers));
 
             if (allAnswers.reduce((a, b) -> a.equals(b) ? "" : a).get().length() == 0) {
-                currentStage.getQuestions().get(currentStage.getQuestions().indexOf(question)).setSolved(true);
+                currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(true);
             } else {
                 currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
                 db.processObject(s -> s.update(currentStageAttempts));
@@ -136,7 +132,7 @@ public class GameHub extends AbstractGame implements Game {
                     s.createQuery(getCorrectAnswerQuery(question)).uniqueResult());
 
             if (correct.getPayload().equals(answers[0])) {
-                currentStage.getQuestions().get(currentStage.getQuestions().indexOf(question)).setSolved(true);
+                currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(true);
             } else {
                 currentStageAttempts.setAttempts(currentStageAttempts.getAttempts() - 1);
                 db.processObject(s -> s.update(currentStageAttempts));
@@ -155,11 +151,11 @@ public class GameHub extends AbstractGame implements Game {
                 new StageAttempts(stageId, userId, categoryId)));
         UserProgress up = new UserProgress(userId, categoryId);
 
-        if (up.getReachedStage() < (getStageIndex(stage) + 1)) { //check if stage is unlocked
+        if (up.getReachedStage() < stage.getNumber()) { //check if stage is unlocked
             throw new IllegalAccessException("Stage is locked");
         }
 
-        sa.setAttempts(10 - getStageIndex(stage));
+        sa.setAttempts(10 - stage.getNumber());
         db.processObject(s -> s.update(sa));
     }
 }

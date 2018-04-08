@@ -1,10 +1,11 @@
 package org.elsys.netprog.game;
 
-import org.elsys.netprog.model.*;
+import org.elsys.netprog.model.StageAttempts;
+import org.elsys.netprog.model.Stages;
+import org.elsys.netprog.model.UserProgress;
 
 public abstract class AbstractGame implements Game {
 
-    Categories currentCategory;
     //to check the stage which is reached -> userProgress.getReachedStage
 
     Stages currentStage;
@@ -12,11 +13,6 @@ public abstract class AbstractGame implements Game {
     UserProgress currentUserProgress;
 
     StageAttempts currentStageAttempts;
-
-    @Override
-    public Categories getCurrentCategory() {
-        return currentCategory;
-    }
 
     @Override
     public Stages getCurrentStage() {

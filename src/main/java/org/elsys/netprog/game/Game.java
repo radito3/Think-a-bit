@@ -20,15 +20,6 @@ public interface Game {
     }
 
     /**
-     * Get the current Category,
-     *
-     * @return The Category object
-     */
-    default Categories getCurrentCategory() {
-        return null;
-    }
-
-    /**
      * Get the current Stage
      *
      * @return The Stage object
@@ -41,9 +32,10 @@ public interface Game {
      * Play a category with the given Id.
      *
      * @param categoryId The Id by which the Category is identified
+     * @param userId The Id of the current user
      * @return The category
      */
-    default Categories playCategory(int categoryId) {
+    default Categories playCategory(int categoryId, int userId) {
         return null;
     }
 
@@ -52,9 +44,10 @@ public interface Game {
      *
      * @param stageId The Id by which the Stage is identified
      * @param userId The Id of the current user
+     * @param categoryId The Id of the current category
      * @return The GameHub instance that is used for the current game session
      */
-    default GameHub playStage(int stageId, int userId) {
+    default GameHub playStage(int stageId, int userId, int categoryId) {
         return null;
     }
 
