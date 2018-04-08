@@ -53,27 +53,18 @@ public class GameRestCalls {
 
     @GET
     @Path("/stage")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStageQuestions(String request,
-                                      @DefaultValue("1") @QueryParam("stageId") int stageId,
+    public Response getStageQuestions(@DefaultValue("1") @QueryParam("stageId") int stageId,
+                                      @DefaultValue("1") @QueryParam("categoryId") int categoryId,
                                       @CookieParam("sessionId") String sessionId) {
-        JSONObject json = new JSONObject(request);
+        if (sessionId == null) { //or  is session has expired
+            return Response.status(401).build();
+        }
         int userId = game.getUserId(Integer.valueOf(sessionId));
-        int categoryId = json.getInt("categoryId");
-
         String output;
-        Stages stage = game.getCurrentStage() == null ||
-                game.getCurrentStage().getId() != stageId ?
-                game.playStage(stageId, userId, categoryId).getCurrentStage() :
-                game.getCurrentStage();
-        List<Question> questions = stage.getQuestions();
 
         try {
-            output = JsonWrapper.getJsonFromObject(questions);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return Response.status(500).build();
+            output = game.playStage(stageId, userId, categoryId);
         } catch (IllegalStateException e) {
             return Response.status(403).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
         }
@@ -132,18 +123,17 @@ public class GameRestCalls {
         int stageId = json.getInt("stageId");
         game.checkIfCurrentStageIsComplete(userId, categoryId, stageId);
 
-        Stream<String> wrongQuestionTitles = game.getCurrentStage().getQuestions() //this should not be with current stage
+        Stream<Question> wrongQuestions = game.getCurrentStage().getQuestions() //this should not be with current stage
                 .stream()
-                .filter(q -> !q.isSolved())
-                .map(Question::getTitle);
+                .filter(q -> !q.isSolved());
         String output;
 
-        if (wrongQuestionTitles.count() == 0) {
+        if (wrongQuestions.count() == 0) {
             output = "{\"wrongQuestions\":[]}";
         } else {
             try {
-                output = "{\"wrongQuestions\":" +
-                        JsonWrapper.getJsonFromObject(wrongQuestionTitles.toArray(String[]::new)) + "}";
+                String[] array = wrongQuestions.map(Question::getTitle).toArray(String[]::new);
+                output = "{\"wrongQuestions\":" + JsonWrapper.getJsonFromObject(array) + "}";
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 return Response.status(500).build();

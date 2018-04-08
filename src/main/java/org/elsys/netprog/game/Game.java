@@ -47,7 +47,7 @@ public interface Game {
      * @param categoryId The Id of the current category
      * @return The GameHub instance that is used for the current game session
      */
-    default GameHub playStage(int stageId, int userId, int categoryId) {
+    default String playStage(int stageId, int userId, int categoryId) {
         return null;
     }
 

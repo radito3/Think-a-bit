@@ -3,6 +3,7 @@ package org.elsys.netprog.game;
 import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.*;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
@@ -52,6 +53,10 @@ public class GameHub extends AbstractGame implements Game {
 
         db.processObject(s -> s.save(new UserProgress(userId, category.getId())));
 
+        return buildCategoryJson(categoryId, userId, category).toString();
+    }
+
+    private StringBuilder buildCategoryJson(int categoryId, int userId, Categories category) {
         StringBuilder json = new StringBuilder("{\"name\":\"" + category.getName() + "\",\"stages\":[");
 
         Integer stages = (Integer) db.getObject(s ->
@@ -64,12 +69,7 @@ public class GameHub extends AbstractGame implements Game {
                     boolean isReached = up.getReachedStage() == stage.getNumber();
                     StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                             new StageAttempts(stage.getId(), userId, categoryId)));
-                    long seconds = 0;
-                    if (sa.getLastAttempt() != null) {
-                        seconds = (sa.getLastAttempt().getTime() + (180L * 1000L)) -
-                                Timestamp.from(Instant.now()).getTime();
-                        seconds = seconds < 0 ? 0 : seconds;
-                    }
+                    long seconds = stageAvailability(sa);
 
                     json.append("{\"id\":").append(stage.getId())
                             .append(",\"isReached\":").append(isReached)
@@ -79,36 +79,73 @@ public class GameHub extends AbstractGame implements Game {
                 });
         json.append("]}");
 
-        return json.toString();
+        return json;
+    }
+
+    private long stageAvailability(final StageAttempts sa) {
+        long seconds = 0;
+        if (sa.getLastAttempt() != null) {
+            seconds = (sa.getLastAttempt().getTime() + (180L * 1000L)) -
+                    Timestamp.from(Instant.now()).getTime();
+            seconds = seconds < 0 ? 0 : seconds;
+        }
+        return seconds;
     }
 
     @Override
-    public GameHub playStage(int stageId, int userId, int categoryId) {
-        Stages stage = db.getObject(s -> s.get(Stages.class, stageId));/*currentCategory.getStages().stream()
-                .filter(s -> s.equals(new Stages(stageId, currentCategory.getId())))
-                .findAny().get();*/
-        StageAttempts sa = new StageAttempts(stage.getId(), userId, categoryId);
+    public String playStage(int stageId, int userId, int categoryId) {
+        Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
+        StageAttempts sa;
+        try {
+            sa = db.getObject(s -> s.get(StageAttempts.class, new StageAttempts(stage.getId(), userId, categoryId)));
+        } catch (Exception e) {
+            sa = new StageAttempts(stage.getId(), userId, categoryId);
+        }
+        UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
 
-        if (true) { //should check the user progress -> reached stage
-            currentStage = stage; //should be removed
-
+        if (stage.getNumber() <= up.getReachedStage() && stageAvailability(sa) == 0) {
             sa.setAttempts(10 - stage.getNumber()); //default stage attempts for 1st stage are 10
-            db.processObject(s -> s.saveOrUpdate(sa));
-            setStageQuestions();
+            final StageAttempts temp = sa;
+            db.processObject(s -> s.saveOrUpdate(temp));
+            setStageQuestions(stage);
 
-            return this;
+            return buildStageJson(categoryId, stageId, stage).toString();
         } else {
             throw new IllegalStateException("Stage is locked");
         }
     }
 
-    private void setStageQuestions() {
-        List<Question> questions = db.getObject(s ->
+    private @NotNull StringBuilder buildStageJson(int categoryId, int stageId, Stages stage) {
+        StringBuilder json = new StringBuilder("{\"category\":{\"id\":");
+        Categories category = db.getObject(s -> s.get(Categories.class, categoryId));
+
+        json.append(category.getId())
+                .append(",\"name\":\"").append(category.getName())
+                .append("\"},\"stageId\":").append(stageId)
+                .append(",\"questions\":[");
+
+        stage.getQuestions().forEach(question -> {
+            json.append("{\"id\":").append(question.getId())
+                .append(",\"title\":\"").append(question.getTitle())
+                .append("\",\"type\":\"").append(String.valueOf(question.getType()))
+                .append("\",\"answers\":[");
+            List<Answers> answers = db.getObject(s ->
+                    s.createQuery("FROM Answers WHERE QuestionId = " + question.getId()).list());
+            answers.forEach(answer ->
+                    json.append("{\"content\":\"").append(answer.getPayload())
+                    .append("\",\"isCorrect\":").append(answer.getIsCorrect()).append("}"));
+            json.append("]}");
+        });
+
+        json.append("]}");
+        return json;
+    }
+
+    private void setStageQuestions(Stages stage) {
+        stage.setQuestions(db.getObject(s ->
                 s.createQuery("FROM Question RIGHT JOIN QuestionStages " +
                         "ON Question.Id = QuestionStages.QuestionId WHERE QuestionStages.StageId = " +
-                        currentStage.getId()).list()); //not tested Query::list method
-        //tested way is with Query::getResultStream, then Stream.collect(Collectors.toList())
-        currentStage.setQuestions(questions);
+                        stage.getId()).list()));
     }
 
     @Override
