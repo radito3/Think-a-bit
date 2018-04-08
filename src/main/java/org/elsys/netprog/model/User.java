@@ -57,7 +57,7 @@ public class User implements Serializable {
     public void setUserName(String userName) {
         Pattern invalidInput = Pattern.compile("[^-_.a-zA-Z0-9]");
 
-        if (invalidInput.matcher(UserName).find()) {
+        if (invalidInput.matcher(userName).find()) {
             throw new IllegalArgumentException("Illegal characters in Username");
         }
 
@@ -71,7 +71,7 @@ public class User implements Serializable {
     public void setPassword(String password) {
         Pattern invalidInput = Pattern.compile("[^-_.a-zA-Z0-9]");
 
-        if (invalidInput.matcher(UserName).find()) {
+        if (invalidInput.matcher(password).find()) {
             throw new IllegalArgumentException("Illegal characters in Password");
         }
 
