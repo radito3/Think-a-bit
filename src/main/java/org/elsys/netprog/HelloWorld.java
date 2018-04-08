@@ -11,8 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Path("/test")
 public class HelloWorld {
@@ -43,7 +43,10 @@ public class HelloWorld {
     @Path("/2")
     @Produces(MediaType.TEXT_PLAIN)
     public Response test() {
-        long diff = Timestamp.from(Instant.now()).getTime();
-        return Response.ok().entity(diff).build();
+        Supplier<Stream<String>> supplier = () -> Stream.of("test");
+        Stream<String> stream = supplier.get();
+        Stream<String> stream1 = supplier.get();
+        long c = stream.count();
+        return Response.ok().entity(stream1.count()).build();
     }
 }

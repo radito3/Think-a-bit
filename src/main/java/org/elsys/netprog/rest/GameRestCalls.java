@@ -2,9 +2,7 @@ package org.elsys.netprog.rest;
 
 import org.elsys.netprog.game.Game;
 import org.elsys.netprog.game.GameHub;
-import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
-import org.elsys.netprog.model.Stages;
 import org.elsys.netprog.view.JsonWrapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,6 +13,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Path("/game")
@@ -72,7 +71,7 @@ public class GameRestCalls {
         return Response.status(200).entity(output).build();
     }
 
-    @GET
+    @POST
     @Path("/buyStageAttempts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -101,10 +100,21 @@ public class GameRestCalls {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response submitAnswers(String request, @CookieParam("sessionId") String sessionId) {
+        if (sessionId == null) { //or is session has expired
+            return Response.status(401).build();
+        }
+
         JSONObject json = new JSONObject(request);
+        int userId = game.getUserId(Integer.valueOf(sessionId));
+        int categoryId = json.getInt("categoryId");
+        int stageId = json.getInt("stageId");
+
+        if (!game.checkIfStageIsAvailable(stageId, userId, categoryId)) {
+            return Response.status(403).build();
+        }
+
         JSONArray qAndA = json.getJSONArray("results");
         List<JSONObject> entities = new LinkedList<>();
-
         for (Object entity : qAndA) {
             entities.add(new JSONObject(entity));
         }
@@ -114,25 +124,20 @@ public class GameRestCalls {
                     Question.Type.valueOf(ent.getString("questionType")),
                     ent.getString("questionTitle"));
             List<Object> answers = ent.getJSONArray("answers").toList();
-            String[] answ = (String[]) answers.toArray();
-            game.answerQuestion(question, answ);
+            String[] answ = answers.stream().toArray(String[]::new);
+            game.answerQuestion(question, stageId, answ);
         });
 
-        int userId = game.getUserId(Integer.valueOf(sessionId));
-        int categoryId = json.getInt("categoryId");
-        int stageId = json.getInt("stageId");
         game.checkIfCurrentStageIsComplete(userId, categoryId, stageId);
 
-        Stream<Question> wrongQuestions = game.getCurrentStage().getQuestions() //this should not be with current stage
-                .stream()
-                .filter(q -> !q.isSolved());
+        Supplier<Stream<Question>> supplier = () -> game.getCurrentStageQuestions().stream().filter(q -> !q.isSolved());
         String output;
 
-        if (wrongQuestions.count() == 0) {
+        if (supplier.get().count() == 0) {
             output = "{\"wrongQuestions\":[]}";
         } else {
             try {
-                String[] array = wrongQuestions.map(Question::getTitle).toArray(String[]::new);
+                String[] array = supplier.get().map(Question::getTitle).toArray(String[]::new);
                 output = "{\"wrongQuestions\":" + JsonWrapper.getJsonFromObject(array) + "}";
             } catch (IOException e) {
                 System.err.println(e.getMessage());

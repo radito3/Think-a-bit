@@ -7,8 +7,6 @@ import org.json.JSONObject;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -67,7 +65,7 @@ public class UserRestCalls {
                 .build();
     }
 
-    @GET
+    @POST
     @Path("/logout")
     public Response logout(@CookieParam("sessionId") String sessionId) {
         if (sessionId == null) { //or  is session has expired

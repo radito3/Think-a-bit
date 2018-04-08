@@ -4,7 +4,6 @@ import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
 import org.elsys.netprog.model.Sessions;
-import org.elsys.netprog.model.Stages;
 
 import java.util.List;
 
@@ -18,15 +17,6 @@ public interface Game {
     default List<Categories> getCategories() {
         return null;
     }
-
-    /**
-     * Get the current Stage
-     *
-     * @return The Stage object
-     */
-    default Stages getCurrentStage() {
-        return null;
-    } //this will be removed
 
     /**
      * Play a category with the given Id.
@@ -65,8 +55,29 @@ public interface Game {
      *
      * @param question The Question needed to checked for answering
      * @param answers A variable amount of answers, depending on the Question Type
+     * @param stageId The Id of the current stage
      */
-    default void answerQuestion(Question question, String... answers) {}
+    default void answerQuestion(Question question, int stageId, String... answers) {}
+
+    /**
+     * Get the questions for the current stage
+     * @return A {@link java.util.List} with the questions
+     */
+    default List<Question> getCurrentStageQuestions() {
+        return null;
+    }
+
+    /**
+     * Check if stage is available
+     *
+     * @param stageId The Id of the current stage
+     * @param userId The Id of the current user
+     * @param categoryId he Id of the current category
+     * @return {@code true} if the stage is available, {@code false} otherwise
+     */
+    default boolean checkIfStageIsAvailable(int stageId, int userId, int categoryId) {
+        return false;
+    }
 
     /**
      * Add attempts to a Stage identified by given stage Id.
