@@ -1,143 +1,26 @@
 package org.elsys.netprog;
 
-import org.elsys.netprog.model.User;
+import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.view.JsonWrapper;
-import org.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.POST;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 @Path("/test")
 public class HelloWorld {
 
-    private interface ITest {
-        default int testMethod(int i) {
-            return i*2;
-        }
-    }
-
-    private class Test implements ITest {
-        private int x = 0;
-
-        public int getX() {
-            return x;
-        }
-
-        public void setX(int x) {
-            this.x = x;
-        }
-
-        @Override
-        public int testMethod(int i) {
-            return i*3;
-        }
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getHelloWorld(String request) {
-        JSONObject parsed = new JSONObject(request);
-        User user = new User(parsed.getInt("id"),
-                parsed.getString("username"),
-                parsed.getString("password"));
-
-        return Response.ok().entity(user.toString()).build();
-    }
-
     @GET
-    @Path("/2")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response testDefaultMethodOverriding() {
-        ITest test = new Test();
-        return Response.status(200).entity(String.valueOf(test.testMethod(2))).build();
-    }
+    public Response getMessage() throws IOException {
+        String str = JsonWrapper.getJsonFromObject(new Categories(1, "test"));
+        String str1 = ",[{\"stageId\":1,\"isUnlocked\":true},{\"stageId\":1,\"isUnlocked\":true}," +
+                "{\"stageId\":1,\"isUnlocked\":false}]}";
+        String output = str.substring(0, str.length() - 1).concat(str1);
 
-    @GET
-    @Path("/3")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response testObjectReferenceModifying() throws IOException {
-        List<Test> list = Arrays.asList(new Test(), new Test());
-        Test test = list.get(0);
-        test.setX(1);
-        return Response.status(200).entity(JsonWrapper.getJsonFromObject(list)).build();
-    }
-
-    @GET
-    @Path("/4")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response testJsonArrayParsing() throws IOException {
-        String[] array = new String[2];
-        array[0] = "one";
-        array[1] = "two";
-        String str = JsonWrapper.getJsonFromObject(array);
-
-        return Response.status(200).entity(str).build();
-    }
-
-    @GET
-    @Path("/1")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response test() {
-        HttpURLConnection connection = null;
-        StringBuilder response = new StringBuilder();
-
-        try {
-            URL url = new URL("http://localhost:8080/Think-a-bit/test");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-
-            String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                    "<user>\n" +
-                    "    <id>1</id>\n" +
-                    "    <username>test</username>\n" +
-                    "    <password>testp</password>\n" +
-                    "</user>";
-            String json = "{\"id\":1,\"username\":\"test\",\"password\":\"testp\"}";
-
-            byte[] value = json.getBytes(StandardCharsets.UTF_8);
-
-            connection.setFixedLengthStreamingMode(value.length);
-            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-
-            connection.connect();
-
-            try (OutputStream os = connection.getOutputStream()) {
-                os.write(value);
-            }
-
-            InputStream is = connection.getInputStream();
-            try (BufferedReader rd = new BufferedReader(new InputStreamReader(is))) {
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    response.append(line).append('\n');
-                }
-            }
-        } catch (Exception e) {
-            return Response.serverError().entity(e.getMessage()).build();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-
-        return Response.ok().entity(response.toString()).build();
+        return Response.ok().entity(output).build();
     }
 }

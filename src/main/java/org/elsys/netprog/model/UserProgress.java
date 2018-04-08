@@ -20,7 +20,7 @@ public class UserProgress implements Serializable {
     private int CategoryId;
 
     @Column(columnDefinition = "mysql->int(11)", name = "ReachedStage", nullable = false)
-    private int ReachedStage = 0;
+    private int ReachedStage = 1;
 
     public UserProgress() {}
 
@@ -66,5 +66,9 @@ public class UserProgress implements Serializable {
 
     public void setReachedStage(int reachedStage) {
         ReachedStage = reachedStage;
+    }
+
+    public void incrementReachedStage() {
+        ReachedStage++;
     }
 }

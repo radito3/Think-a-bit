@@ -38,12 +38,12 @@ public class GameRestCalls {
 
     @GET
     @Path("/category/{categoryId}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCategory(@PathParam("categoryId") int categoryId) {
-        Categories category = game.getCurrentCategory() == null ||
-                game.getCurrentCategory().getId() != categoryId ?
-                game.playCategory(categoryId).getCurrentCategory() :
-                game.getCurrentCategory();
+    public Response getCategory(String request, @PathParam("categoryId") int categoryId) {
+        JSONObject json = new JSONObject(request);
+
+        Categories category = game.playCategory(categoryId);
         String output; //includes which stage is unlocked
 
         try {
@@ -58,12 +58,16 @@ public class GameRestCalls {
 
     @GET
     @Path("/stage")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStageQuestions(@DefaultValue("1") @QueryParam("stageId") int stageId) {
+    public Response getStageQuestions(String request, @DefaultValue("1") @QueryParam("stageId") int stageId) {
+        JSONObject json = new JSONObject(request);
+        int userId = json.getInt("userId");
+
         String output;
         Stages stage = game.getCurrentStage() == null ||
                 game.getCurrentStage().getId() != stageId ?
-                game.playStage(stageId).getCurrentStage() :
+                game.playStage(stageId, userId).getCurrentStage() :
                 game.getCurrentStage();
         List<Question> questions = stage.getQuestions();
 
@@ -81,11 +85,15 @@ public class GameRestCalls {
 
     @GET
     @Path("/buyStageAttempts")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response buyStageAttempts(@DefaultValue("1") @QueryParam("stageId") int stageId) {
+    public Response buyStageAttempts(String request, @DefaultValue("1") @QueryParam("stageId") int stageId) {
+        JSONObject json = new JSONObject(request);
+        int userId = json.getInt("userId");
+        int categoryId = json.getInt("categoryId");
 
         try {
-            game.buyAttempts(stageId);
+            game.buyAttempts(stageId, userId, categoryId);
         } catch (IllegalAccessException e) {
             return Response.status(403).entity("\"msg\":\"" + e.getMessage() + "\"").build();
         }
@@ -97,8 +105,9 @@ public class GameRestCalls {
     @Path("/stage")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response submitAnswers(String request) {
-        JSONArray qAndA = new JSONObject(request).getJSONArray("form");
+    public Response submitAnswers(String request, @CookieParam("sessionId") String sessionId) {
+        JSONObject json = new JSONObject(request);
+        JSONArray qAndA = json.getJSONArray("results");
         List<JSONObject> entities = new LinkedList<>();
 
         for (Object entity : qAndA) {
@@ -114,7 +123,11 @@ public class GameRestCalls {
             game.answerQuestion(question, answ);
         });
 
-        boolean solvedStage = game.checkIfCurrentStageIsComplete();
+        int userId = game.getUserId(Integer.valueOf(sessionId));
+        int categoryId = json.getInt("categoryId");
+        int stageId = json.getInt("stageId");
+        boolean solvedStage = game.checkIfCurrentStageIsComplete(userId, categoryId, stageId);
+
         String[] wrongQuestionTitles = (String[]) game.getCurrentStage().getQuestions()
                 .stream()
                 .filter(q -> !q.isSolved())

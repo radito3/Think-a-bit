@@ -31,7 +31,7 @@ CREATE TABLE Answers (
 CREATE TABLE UserProgress (
   UserId INTEGER NOT NULL,
   CategoryId INTEGER NOT NULL,
-  ReachedStage INTEGER NOT NULL DEFAULT 0,
+  ReachedStage INTEGER NOT NULL DEFAULT 1,
 
   PRIMARY KEY (UserId, CategoryId),
   FOREIGN KEY (UserId) REFERENCES Users(Id),

@@ -4,8 +4,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Entity
 @Table(name = "Stages")
@@ -18,24 +16,11 @@ public class Stages implements Serializable {
     @Column(columnDefinition = "mysql->int(11)", name = "CategoryId", nullable = false)
     private int CategoryId;
 
-    @Transient
-    private boolean isUnlocked = false;
+    @Column(columnDefinition = "mysql->int(11)", name = "Number", nullable = false)
+    private int Number;
 
     @Transient
     private List<Question> questions;
-
-    @Transient
-    private Timer timeout = new Timer();
-
-    public void setTimeout(int seconds) {
-        this.timeout.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                setUnlocked(true);
-                this.cancel(); //not sure if needed
-            }
-        }, seconds * 1000);
-    }
 
     public Stages() {}
 
@@ -60,20 +45,20 @@ public class Stages implements Serializable {
         CategoryId = categoryId;
     }
 
-    public boolean isUnlocked() {
-        return isUnlocked;
-    }
-
-    public void setUnlocked(boolean unlocked) {
-        isUnlocked = unlocked;
-    }
-
     public List<Question> getQuestions() {
         return questions;
     }
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public int getNumber() {
+        return Number;
+    }
+
+    public void setNumber(int number) {
+        Number = number;
     }
 
     @Override

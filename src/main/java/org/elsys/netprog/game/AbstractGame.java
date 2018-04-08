@@ -2,24 +2,16 @@ package org.elsys.netprog.game;
 
 import org.elsys.netprog.model.*;
 
-import java.util.List;
-
 public abstract class AbstractGame implements Game {
 
-//    protected List<Categories> categories;
-
     Categories currentCategory;
-
-    User currentUser;
+    //to check the stage which is reached -> userProgress.getReachedStage
 
     Stages currentStage;
 
     UserProgress currentUserProgress;
 
     StageAttempts currentStageAttempts;
-
-//    @Override
-//    public List<Categories> getCategories() { return categories; }
 
     @Override
     public Categories getCurrentCategory() {

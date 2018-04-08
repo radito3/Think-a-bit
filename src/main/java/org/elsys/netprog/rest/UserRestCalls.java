@@ -3,14 +3,17 @@ package org.elsys.netprog.rest;
 import org.elsys.netprog.game.UserManagement;
 import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
-import org.elsys.netprog.view.JsonWrapper;
 import org.json.JSONObject;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
@@ -34,7 +37,7 @@ public class UserRestCalls {
             return Response.status(500).build();
         }
         Sessions session = new Sessions(user.getId(), Long.valueOf(UUID.randomUUID().toString()),
-                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000)));
+                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000))); //30 minutes
 
         return Response.status(200)
                 .cookie(new NewCookie("sessionId", String.valueOf(session.getSessionId())))
@@ -59,7 +62,6 @@ public class UserRestCalls {
     @GET
     @Path("/logout")
     public Response logout(@CookieParam("sessionId") String sessionId) {
-        users.logout();
         users.deleteSessionData(Integer.valueOf(sessionId));
 
         return Response.status(200).cookie().build();

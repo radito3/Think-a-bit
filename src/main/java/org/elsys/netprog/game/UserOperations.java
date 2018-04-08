@@ -8,8 +8,6 @@ public interface UserOperations {
 
     User login(String userName, String password) throws IllegalAccessException;
 
-    void logout();
-
     void deleteSessionData(int sessionId);
 
     void update(int id, String userName, String password);

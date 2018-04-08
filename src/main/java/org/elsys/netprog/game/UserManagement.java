@@ -7,7 +7,7 @@ import org.elsys.netprog.model.User;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class UserManagement extends AbstractGame implements UserOperations {
+public class UserManagement implements UserOperations {
 
     private final DatabaseUtil db;
 
@@ -43,11 +43,6 @@ public class UserManagement extends AbstractGame implements UserOperations {
     public void deleteSessionData(int sessionId) {
         Sessions session = db.getObject(s -> s.get(Sessions.class, sessionId));
         db.processObject(s -> s.delete(session));
-    }
-
-    @Override
-    public void logout() {
-        currentUser = null;
     }
 
     @Override
