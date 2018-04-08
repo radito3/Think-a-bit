@@ -59,6 +59,7 @@ CREATE TABLE StageAttempts (
   UserId INTEGER NOT NULL,
   CategoryId INTEGER NOT NULL,
   Attempts INTEGER NOT NULL DEFAULT 0,
+  LastAttempt TIMESTAMP,
 
   PRIMARY KEY (StageId, UserId),
   FOREIGN KEY (UserId) REFERENCES Users(Id),

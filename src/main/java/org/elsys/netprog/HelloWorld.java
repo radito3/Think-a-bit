@@ -11,6 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @Path("/test")
 public class HelloWorld {
@@ -35,5 +37,13 @@ public class HelloWorld {
         UserProgress progress = db.getObject(s -> s.get(UserProgress.class, new UserProgress(1, 1)));
 
         return Response.ok().entity(progress.getReachedStage()).build();
+    }
+
+    @GET
+    @Path("/2")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response test() {
+        long diff = Timestamp.from(Instant.now()).getTime();
+        return Response.ok().entity(diff).build();
     }
 }

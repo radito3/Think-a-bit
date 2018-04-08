@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -25,6 +26,9 @@ public class StageAttempts implements Serializable {
 
     @Column(columnDefinition = "mysql->int(11)", name = "Attempts", nullable = false)
     private int Attempts = 0;
+
+    @Column(columnDefinition = "mysql->datetime", name = "LastAttempt")
+    private Timestamp LastAttempt;
 
     public StageAttempts() {}
 
@@ -80,5 +84,13 @@ public class StageAttempts implements Serializable {
 
     public void setAttempts(int attempts) {
         Attempts = attempts;
+    }
+
+    public Timestamp getLastAttempt() {
+        return LastAttempt;
+    }
+
+    public void setLastAttempt(Timestamp lastAttempt) {
+        LastAttempt = lastAttempt;
     }
 }

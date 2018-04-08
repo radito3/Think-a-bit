@@ -33,8 +33,7 @@ public class UserRestCalls {
             user = users.login(userData.getString("username"),
                     userData.getString("password"));
         } catch (IllegalAccessException e) {
-            System.err.println(e.getMessage());
-            return Response.status(500).build();
+            return Response.status(404).build();
         }
         Sessions session = new Sessions(user.getId(), Long.valueOf(UUID.randomUUID().toString()),
                 Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000))); //30 minutes
@@ -45,12 +44,21 @@ public class UserRestCalls {
     }
 
     @POST
-    @Path("/create")
+    @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(String request) {
+    public Response register(String request) {
         JSONObject userData = new JSONObject(request);
-        User user = users.register(userData.getString("username"),
-                userData.getString("password"));
+        User user;
+
+        try {
+            user = users.register(userData.getString("username"),
+                    userData.getString("password"));
+        } catch (IllegalAccessException e) {
+            return Response.status(412).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(400).build();
+        }
+
         Sessions session = new Sessions(user.getId(), Long.valueOf(UUID.randomUUID().toString()),
                 Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000)));
 

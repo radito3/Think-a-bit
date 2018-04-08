@@ -33,9 +33,9 @@ public interface Game {
      *
      * @param categoryId The Id by which the Category is identified
      * @param userId The Id of the current user
-     * @return The category
+     * @return The json needed from that category
      */
-    default Categories playCategory(int categoryId, int userId) {
+    default String playCategory(int categoryId, int userId) {
         return null;
     }
 
@@ -57,11 +57,8 @@ public interface Game {
      * @param userId The Id of the current user
      * @param categoryId The Id of the current category
      * @param stageId The Id of the current stage
-     * @return {@code true} if the stage is complete, {@code false} otherwise
      */
-    default boolean checkIfCurrentStageIsComplete(int userId, int categoryId, int stageId) {
-        return false;
-    }
+    default void checkIfCurrentStageIsComplete(int userId, int categoryId, int stageId) {}
 
     /**
      * Answer a given question.
@@ -88,7 +85,7 @@ public interface Game {
      * Get the current user id.
      *
      * @param sessionId The session id of the current session
-     * @return The user is
+     * @return The user id
      */
     default int getUserId(int sessionId) {
         return DatabaseUtil.getInstance().getObject(s -> s.get(Sessions.class, sessionId)).getUserId();

@@ -3,6 +3,8 @@ package org.elsys.netprog.game;
 import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.*;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,17 +40,46 @@ public class GameHub extends AbstractGame implements Game {
 
     @Override
     public List<Categories> getCategories() {
-        return IntStream.range(1, 10).mapToObj(i ->
+        int categories = db.getObject(s ->
+                s.createQuery("SELECT COUNT(Categories.Id) FROM Categories").getFetchSize());
+        return IntStream.rangeClosed(1, categories).mapToObj(i ->
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
     }
 
     @Override
-    public Categories playCategory(int categoryId, int userId) {
+    public String playCategory(int categoryId, int userId) {
         Categories category = db.getObject(s -> s.get(Categories.class, categoryId));
 
         db.processObject(s -> s.save(new UserProgress(userId, category.getId())));
 
-        return category;
+        StringBuilder json = new StringBuilder("{\"name\":\"" + category.getName() + "\",\"stages\":[");
+
+        Integer stages = (Integer) db.getObject(s ->
+                s.createQuery("SELECT COUNT(Stages.Id) FROM Stages WHERE Stages.CategoryId = " + categoryId)
+                        .uniqueResult());
+        IntStream.rangeClosed(1, stages).mapToObj(i -> db.getObject(s -> s.get(Stages.class, i)))
+                .forEach(stage -> {
+                    UserProgress up = db.getObject(s -> s.get(UserProgress.class,
+                            new UserProgress(userId, categoryId)));
+                    boolean isReached = up.getReachedStage() == stage.getNumber();
+                    StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
+                            new StageAttempts(stage.getId(), userId, categoryId)));
+                    long seconds = 0;
+                    if (sa.getLastAttempt() != null) {
+                        seconds = (sa.getLastAttempt().getTime() + (180L * 1000L)) -
+                                Timestamp.from(Instant.now()).getTime();
+                        seconds = seconds < 0 ? 0 : seconds;
+                    }
+
+                    json.append("{\"id\":").append(stage.getId())
+                            .append(",\"isReached\":").append(isReached)
+                            .append(",\"attempts\":").append(sa.getAttempts())
+                            .append(",\"availableAfter\":").append(seconds)
+                            .append("}");
+                });
+        json.append("]}");
+
+        return json.toString();
     }
 
     @Override
@@ -81,7 +112,7 @@ public class GameHub extends AbstractGame implements Game {
     }
 
     @Override
-    public boolean checkIfCurrentStageIsComplete(int userId, int categoryId, int stageId) {
+    public void checkIfCurrentStageIsComplete(int userId, int categoryId, int stageId) {
         if (currentStage.getQuestions().stream().allMatch(Question::isSolved)) {
 //            currentStage.setTimeout(180); //set a variable to tell when this stage is available for playing again
 
@@ -90,23 +121,22 @@ public class GameHub extends AbstractGame implements Game {
 
             db.processObject(s -> s.update(currentUserProgress));
 
-            StageAttempts sa = new StageAttempts(currentStage.getId(), userId, categoryId);
+            StageAttempts sa = new StageAttempts(stageId, userId, categoryId);
             sa.setAttempts(10 - currentStage.getNumber());
 
             db.processObject(s -> s.update(sa));
 
             currentStage = null;
-
-            return true;
         } else {
             StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                     new StageAttempts(currentStage.getId(), userId, categoryId)));
             sa.setAttempts(sa.getAttempts() - 1);
 
             db.processObject(s -> s.update(sa));
-
-            return false;
         }
+        StageAttempts sa = new StageAttempts(stageId, userId, categoryId);
+        sa.setLastAttempt(Timestamp.from(Instant.now()));
+        db.processObject(s -> s.update(sa));
     }
 
     private int getQuestionIndex(Question question) {

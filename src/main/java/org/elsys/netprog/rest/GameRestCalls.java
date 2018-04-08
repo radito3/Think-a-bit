@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Path("/game")
 public class GameRestCalls {
@@ -41,15 +42,11 @@ public class GameRestCalls {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategory(@PathParam("categoryId") int categoryId,
                                 @CookieParam("sessionId") String sessionId) {
-        Categories category = game.playCategory(categoryId, Integer.valueOf(sessionId));
-        String output; //includes which stage is unlocked
-
-        try {
-            output = JsonWrapper.getJsonFromObject(category);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return Response.status(500).build();
+        if (sessionId == null) { //or  is session has expired
+            return Response.status(401).build();
         }
+
+        String output = game.playCategory(categoryId, game.getUserId(Integer.valueOf(sessionId)));
 
         return Response.status(200).entity(output).build();
     }
@@ -133,20 +130,20 @@ public class GameRestCalls {
         int userId = game.getUserId(Integer.valueOf(sessionId));
         int categoryId = json.getInt("categoryId");
         int stageId = json.getInt("stageId");
-        boolean solvedStage = game.checkIfCurrentStageIsComplete(userId, categoryId, stageId);
+        game.checkIfCurrentStageIsComplete(userId, categoryId, stageId);
 
-        String[] wrongQuestionTitles = (String[]) game.getCurrentStage().getQuestions() //this should not be with current stage
+        Stream<String> wrongQuestionTitles = game.getCurrentStage().getQuestions() //this should not be with current stage
                 .stream()
                 .filter(q -> !q.isSolved())
-                .map(Question::getTitle)
-                .toArray();
+                .map(Question::getTitle);
         String output;
 
-        if (solvedStage) {
+        if (wrongQuestionTitles.count() == 0) {
             output = "{\"wrongQuestions\":[]}";
         } else {
             try {
-                output = "{\"wrongQuestions\":" + JsonWrapper.getJsonFromObject(wrongQuestionTitles) + "}";
+                output = "{\"wrongQuestions\":" +
+                        JsonWrapper.getJsonFromObject(wrongQuestionTitles.toArray(String[]::new)) + "}";
             } catch (IOException e) {
                 System.err.println(e.getMessage());
                 return Response.status(500).build();

@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -73,7 +75,7 @@ public class User implements Serializable {
             throw new IllegalArgumentException("Illegal characters in Password");
         }
 
-        Password = password;
+        Password = cryptWithMD5(password);
     }
 
     @Override
@@ -91,12 +93,22 @@ public class User implements Serializable {
         return Objects.hash(Id, UserName, Password);
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "Id=" + Id +
-                ", UserName='" + UserName + '\'' +
-                ", Password='" + Password + '\'' +
-                '}';
+    public static String cryptWithMD5(String pass) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] passBytes = pass.getBytes();
+            md.reset();
+            byte[] digested = md.digest(passBytes);
+
+            StringBuilder sb = new StringBuilder();
+            for (byte aDigested : digested) {
+                sb.append(Integer.toHexString(0xff & aDigested));
+            }
+
+            return sb.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 }

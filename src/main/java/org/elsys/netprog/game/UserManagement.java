@@ -4,9 +4,6 @@ import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class UserManagement implements UserOperations {
 
     private final DatabaseUtil db;
@@ -18,22 +15,35 @@ public class UserManagement implements UserOperations {
     @Override
     public User login(String userName, String password) throws IllegalAccessException {
         User user;
-        String encryptedPass = cryptWithMD5(password);
+        String encryptedPass = User.cryptWithMD5(password);
 
         try {
             user = (User) db.getObject(s ->
                     s.createQuery("FROM User WHERE UserName = '" + userName +
                             "' AND Password = '" + encryptedPass + "'").uniqueResult());
         } catch (Exception e) {
-            throw new IllegalAccessException("No such user"); //or more than 1 user with same credentials
+            throw new IllegalAccessException();
         }
 
         return user;
     }
 
     @Override
-    public User register(String userName, String password) {
-        User user = new User(userName, cryptWithMD5(password));
+    public User register(String userName, String password) throws IllegalArgumentException, IllegalAccessException {
+        User user;
+        String encryptedPass = User.cryptWithMD5(password);
+
+        try {
+            db.getObject(s -> s.createQuery("FROM User WHERE UserName = '" + userName +
+                            "' AND Password = '" + encryptedPass + "'").uniqueResult());
+        } catch (Exception e) {
+            throw new IllegalAccessException();
+        }
+
+        user = new User();
+        user.setUserName(userName);
+        user.setPassword(password);
+
         db.processObject(s -> s.save(user));
 
         return user;
@@ -61,23 +71,4 @@ public class UserManagement implements UserOperations {
 //        User user = new User(userId, userName, cryptWithMD5(password));
 //        db.processObject(s -> s.delete(user));
 //    }
-
-    private static String cryptWithMD5(String pass) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] passBytes = pass.getBytes();
-            md.reset();
-            byte[] digested = md.digest(passBytes);
-
-            StringBuilder sb = new StringBuilder();
-            for (byte aDigested : digested) {
-                sb.append(Integer.toHexString(0xff & aDigested));
-            }
-
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
 }
