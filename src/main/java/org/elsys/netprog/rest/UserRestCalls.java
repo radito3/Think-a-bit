@@ -14,6 +14,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Path("/users")
@@ -33,8 +34,9 @@ public class UserRestCalls {
         } catch (IllegalAccessException e) {
             return Response.status(404).build();
         }
-        Sessions session = new Sessions(user.getId(), Long.valueOf(UUID.randomUUID().toString()),
-                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000))); //30 minutes
+        Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
+                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(300 * 1000)));
+        users.saveSessionData(session);
 
         return Response.status(200)
                 .cookie(new NewCookie("sessionId", String.valueOf(session.getSessionId())))
@@ -57,8 +59,9 @@ public class UserRestCalls {
             return Response.status(400).build();
         }
 
-        Sessions session = new Sessions(user.getId(), Long.valueOf(UUID.randomUUID().toString()),
-                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(30 * 1000)));
+        Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
+                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(300 * 1000)));
+        users.saveSessionData(session);
 
         return Response.status(201)
                 .cookie(new NewCookie("sessionId", String.valueOf(session.getSessionId())))
@@ -72,9 +75,19 @@ public class UserRestCalls {
             return Response.status(401).build();
         }
 
-        users.deleteSessionData(Integer.valueOf(sessionId));
+        users.deleteSessionData(UUID.fromString(sessionId));
 
-        return Response.status(204).cookie().build();
+        NewCookie cookie = new NewCookie("sessionId",
+                "",
+                "/Think-a-bit/users",
+                "localhost",
+                1,
+                "",
+                0,
+                new Date(System.currentTimeMillis() - 10),
+                false,
+                true);
+        return Response.status(204).cookie(cookie).build();
     }
 
 //    @POST

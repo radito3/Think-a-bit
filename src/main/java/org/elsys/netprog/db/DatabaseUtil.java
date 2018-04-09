@@ -69,10 +69,10 @@ public class DatabaseUtil implements Connector {
 
             transaction.commit();
         } catch (Exception e) {
+            e.printStackTrace();
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
         }
 
         return null;

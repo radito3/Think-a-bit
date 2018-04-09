@@ -10,9 +10,7 @@
             This class contains users' sessions.
         </meta>
 
-        <id name = "SessionId" type = "long" column = "SessionId" >
-            <generator class="native"/>
-        </id>
+        <id name = "SessionId" type = "char" column = "SessionId" />
 
         <property name = "UserId" type = "int" column = "UserId" />
         <property name = "CreatedAt" type = "timestamp" column = "CreatedAt" />

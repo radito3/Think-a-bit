@@ -45,9 +45,9 @@ public class GameHub implements Game {
 
     @Override
     public List<Categories> getCategories() {
-        Integer categories = (Integer) db.getObject(s ->
-                s.createQuery("SELECT COUNT(Categories.Id) FROM Categories").uniqueResult());
-        return IntStream.rangeClosed(1, categories).mapToObj(i ->
+        Long categories = (Long) db.getObject(s ->
+                s.createQuery("SELECT COUNT(*) FROM Categories").uniqueResult());
+        return IntStream.rangeClosed(1, Integer.parseInt(categories.toString())).mapToObj(i ->
                 db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
     }
 
@@ -63,10 +63,11 @@ public class GameHub implements Game {
     private StringBuilder buildCategoryJson(int categoryId, int userId, Categories category) {
         StringBuilder json = new StringBuilder("{\"name\":\"" + category.getName() + "\",\"stages\":[");
 
-        Integer stages = (Integer) db.getObject(s ->
-                s.createQuery("SELECT COUNT(Stages.Id) FROM Stages WHERE Stages.CategoryId = " + categoryId)
+        Long stages = (Long) db.getObject(s ->
+                s.createQuery("SELECT COUNT(*) FROM Stages WHERE Stages.CategoryId = " + categoryId)
                         .uniqueResult());
-        IntStream.rangeClosed(1, stages).mapToObj(i -> db.getObject(s -> s.get(Stages.class, i)))
+        IntStream.rangeClosed(1, Integer.parseInt(stages.toString()))
+                .mapToObj(i -> db.getObject(s -> s.get(Stages.class, i)))
                 .forEach(stage -> {
                     UserProgress up = db.getObject(s -> s.get(UserProgress.class,
                             new UserProgress(userId, categoryId)));

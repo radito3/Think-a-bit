@@ -7,6 +7,7 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "Sessions")
@@ -16,8 +17,8 @@ public class Sessions implements Serializable {
     private int UserId;
 
     @Id
-    @Column(columnDefinition = "mysql->bigint(20)", name = "SessionId", nullable = false)
-    private long SessionId;
+    @Column(columnDefinition = "mysql->char(36)", name = "SessionId", nullable = false, unique = true, length = 36)
+    private UUID SessionId;
 
     @Column(columnDefinition = "mysql->timestamp", name = "CreatedAt")
     private Timestamp CreatedAt;
@@ -27,7 +28,7 @@ public class Sessions implements Serializable {
 
     public Sessions() {}
 
-    public Sessions(int userId, long sessionId, Timestamp createdAt, Timestamp expiresAt) {
+    public Sessions(int userId, UUID sessionId, Timestamp createdAt, Timestamp expiresAt) {
         this.UserId = userId;
         this.SessionId = sessionId;
         this.CreatedAt = createdAt;
@@ -42,11 +43,11 @@ public class Sessions implements Serializable {
         UserId = userId;
     }
 
-    public long getSessionId() {
+    public UUID getSessionId() {
         return SessionId;
     }
 
-    public void setSessionId(long sessionId) {
+    public void setSessionId(UUID sessionId) {
         SessionId = sessionId;
     }
 
@@ -67,12 +68,12 @@ public class Sessions implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Sessions sessions = (Sessions) o;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Sessions sessions = (Sessions) object;
         return UserId == sessions.UserId &&
-                SessionId == sessions.SessionId &&
+                Objects.equals(SessionId, sessions.SessionId) &&
                 Objects.equals(CreatedAt, sessions.CreatedAt) &&
                 Objects.equals(ExpiresAt, sessions.ExpiresAt);
     }

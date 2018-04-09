@@ -4,6 +4,9 @@ import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
 
+import java.io.UnsupportedEncodingException;
+import java.util.UUID;
+
 public class UserManagement implements UserOperations {
 
     private final DatabaseUtil db;
@@ -34,8 +37,11 @@ public class UserManagement implements UserOperations {
         String encryptedPass = User.cryptWithMD5(password);
 
         try {
-            db.getObject(s -> s.createQuery("FROM User WHERE UserName = '" + userName +
+            user = (User) db.getObject(s -> s.createQuery("FROM User WHERE UserName = '" + userName +
                             "' AND Password = '" + encryptedPass + "'").uniqueResult());
+            if (user != null) {
+                throw new Exception();
+            }
         } catch (Exception e) {
             throw new IllegalAccessException();
         }
@@ -44,13 +50,19 @@ public class UserManagement implements UserOperations {
         user.setUserName(userName);
         user.setPassword(password);
 
-        db.processObject(s -> s.save(user));
+        final User temp = user;
+        db.processObject(s -> s.save(temp));
 
         return user;
     }
 
     @Override
-    public void deleteSessionData(int sessionId) {
+    public void saveSessionData(final Sessions session) {
+        db.processObject(s -> s.save(session));
+    }
+
+    @Override
+    public void deleteSessionData(UUID sessionId) {
         Sessions session = db.getObject(s -> s.get(Sessions.class, sessionId));
         db.processObject(s -> s.delete(session));
     }

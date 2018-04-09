@@ -1,6 +1,9 @@
 package org.elsys.netprog.game;
 
+import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
+
+import java.util.UUID;
 
 public interface UserOperations {
 
@@ -8,7 +11,9 @@ public interface UserOperations {
 
     User login(String userName, String password) throws IllegalAccessException;
 
-    void deleteSessionData(int sessionId);
+    void deleteSessionData(UUID sessionId);
+
+    void saveSessionData(Sessions session);
 
 //    void update(int id, String userName, String password);
 
