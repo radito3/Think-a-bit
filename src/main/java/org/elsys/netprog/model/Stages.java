@@ -67,11 +67,12 @@ public class Stages implements Serializable {
         if (object == null || getClass() != object.getClass()) return false;
         Stages stages = (Stages) object;
         return Id == stages.Id &&
-                CategoryId == stages.CategoryId;
+                CategoryId == stages.CategoryId &&
+                Number == stages.Number;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Id, CategoryId);
+        return Objects.hash(Id, CategoryId, Number);
     }
 }

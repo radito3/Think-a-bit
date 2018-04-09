@@ -55,7 +55,10 @@ public class GameHub implements Game {
     public String playCategory(int categoryId, int userId) {
         Categories category = db.getObject(s -> s.get(Categories.class, categoryId));
 
-        db.processObject(s -> s.save(new UserProgress(userId, category.getId())));
+        db.processObject(s -> s.saveOrUpdate(new UserProgress(userId, category.getId())));
+        List<Stages> stages = db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " +
+                category.getId()).list());
+        stages.forEach(s -> db.processObject(i -> i.saveOrUpdate(new StageAttempts(s.getId(), userId, categoryId))));
 
         return buildCategoryJson(categoryId, userId, category).toString();
     }
@@ -64,11 +67,14 @@ public class GameHub implements Game {
         StringBuilder json = new StringBuilder("{\"name\":\"" + category.getName() + "\",\"stages\":[");
 
         Long stages = (Long) db.getObject(s ->
-                s.createQuery("SELECT COUNT(*) FROM Stages WHERE Stages.CategoryId = " + categoryId)
-                        .uniqueResult());
+                s.createQuery("SELECT COUNT(*) FROM Stages WHERE CategoryId = " + categoryId).uniqueResult());
+
         IntStream.rangeClosed(1, Integer.parseInt(stages.toString()))
-                .mapToObj(i -> db.getObject(s -> s.get(Stages.class, i)))
-                .forEach(stage -> {
+                .mapToObj(i -> db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " + categoryId)
+                        .setFirstResult(i - 1).list()))
+                .map(o -> (List<Stages>)o)
+                .forEach(stages1 -> {
+                    Stages stage = stages1.get(0);
                     UserProgress up = db.getObject(s -> s.get(UserProgress.class,
                             new UserProgress(userId, categoryId)));
                     boolean isReached = up.getReachedStage() == stage.getNumber();
@@ -80,8 +86,9 @@ public class GameHub implements Game {
                             .append(",\"isReached\":").append(isReached)
                             .append(",\"attempts\":").append(sa.getAttempts())
                             .append(",\"availableAfter\":").append(seconds)
-                            .append("}");
+                            .append("},");
                 });
+        json.deleteCharAt(json.lastIndexOf(","));
         json.append("]}");
 
         return json;
@@ -90,7 +97,7 @@ public class GameHub implements Game {
     private long stageAvailability(final StageAttempts sa) {
         long seconds = 0;
         if (sa.getLastAttempt() != null) {
-            seconds = (sa.getLastAttempt().getTime() + (180L * 1000L)) -
+            seconds = (sa.getLastAttempt().getTime() + 1800L) -
                     Timestamp.from(Instant.now()).getTime();
             seconds = seconds < 0 ? 0 : seconds;
         }
@@ -145,10 +152,12 @@ public class GameHub implements Game {
                     s.createQuery("FROM Answers WHERE QuestionId = " + question.getId()).list());
             answers.forEach(answer ->
                     json.append("{\"content\":\"").append(answer.getPayload())
-                    .append("\",\"isCorrect\":").append(answer.getIsCorrect()).append("}"));
-            json.append("]}");
+                    .append("\",\"isCorrect\":").append(answer.getIsCorrect()).append("},"));
+            json.deleteCharAt(json.lastIndexOf(","));
+            json.append("]},");
         });
 
+        json.deleteCharAt(json.lastIndexOf(","));
         json.append("]}");
         return json;
     }

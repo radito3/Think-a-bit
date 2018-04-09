@@ -24,6 +24,9 @@ public class UserManagement implements UserOperations {
             user = (User) db.getObject(s ->
                     s.createQuery("FROM User WHERE UserName = '" + userName +
                             "' AND Password = '" + encryptedPass + "'").uniqueResult());
+            if (user == null) {
+                throw new Exception();
+            }
         } catch (Exception e) {
             throw new IllegalAccessException();
         }

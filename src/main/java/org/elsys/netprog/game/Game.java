@@ -6,6 +6,7 @@ import org.elsys.netprog.model.Question;
 import org.elsys.netprog.model.Sessions;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface Game {
 
@@ -98,7 +99,7 @@ public interface Game {
      * @param sessionId The session id of the current session
      * @return The user id
      */
-    default int getUserId(int sessionId) {
+    default int getUserId(UUID sessionId) {
         return DatabaseUtil.getInstance().getObject(s -> s.get(Sessions.class, sessionId)).getUserId();
     }
 }

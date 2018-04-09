@@ -8,6 +8,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -44,12 +45,15 @@ public class UserRestCalls {
         }
 
         Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
-                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(300 * 1000)));
+                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(1800 * 1000)));
         users.saveSessionData(session);
 
-        return Response.status(200)
-                .cookie(new NewCookie("sessionId", String.valueOf(session.getSessionId())))
-                .build();
+        NewCookie cookie = new NewCookie("sessionId", String.valueOf(session.getSessionId()),
+                "/Think-a-bit","localhost",1,"",1800,
+                new Date(System.currentTimeMillis() + (1800 * 1000)),false,true);
+        Cookie cookie1 = new Cookie("sessionId", String.valueOf(session.getSessionId()),"/Think-a-bit",
+                "localhost",1);
+        return Response.status(200).cookie(new NewCookie(cookie1)).build();
     }
 
     @POST
@@ -75,12 +79,14 @@ public class UserRestCalls {
         }
 
         Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
-                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(300 * 1000)));
+                Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(1800 * 1000)));
         users.saveSessionData(session);
 
-        return Response.status(201)
-                .cookie(new NewCookie("sessionId", String.valueOf(session.getSessionId())))
-                .build();
+
+        NewCookie cookie = new NewCookie("sessionId", String.valueOf(session.getSessionId()),
+                "/Think-a-bit","localhost",1,"",1800,
+                new Date(System.currentTimeMillis() + (1800 * 1000)),false,true);
+        return Response.status(201).cookie(cookie).build();
     }
 
     @POST
@@ -92,16 +98,8 @@ public class UserRestCalls {
 
         users.deleteSessionData(UUID.fromString(sessionId));
 
-        NewCookie cookie = new NewCookie("sessionId",
-                "",
-                "/Think-a-bit/users",
-                "localhost",
-                1,
-                "",
-                0,
-                new Date(System.currentTimeMillis() - 10),
-                false,
-                true);
+        NewCookie cookie = new NewCookie("sessionId","","/Think-a-bit/users","localhost",
+                1,"",0, new Date(System.currentTimeMillis() - 10),false,true);
         return Response.status(204).cookie(cookie).build();
     }
 
