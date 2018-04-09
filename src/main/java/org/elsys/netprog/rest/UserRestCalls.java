@@ -3,7 +3,6 @@ package org.elsys.netprog.rest;
 import org.elsys.netprog.game.UserManagement;
 import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
-import org.json.JSONObject;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
@@ -12,6 +11,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
@@ -24,16 +25,24 @@ public class UserRestCalls {
 
     @POST
     @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response login(String request) {
-        JSONObject userData = new JSONObject(request);
+        String req;
         User user;
         try {
-            user = users.login(userData.getString("username"),
-                    userData.getString("password"));
+            req = URLDecoder.decode(request, "UTF-8");
+            String[] data = req.split("&");
+            String username = data[0].substring(data[0].indexOf('=') + 1);
+            String password = data[1].substring(data[1].indexOf('=') + 1);
+
+            user = users.login(username, password);
         } catch (IllegalAccessException e) {
             return Response.status(404).build();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return Response.status(500).build();
         }
+
         Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
                 Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(300 * 1000)));
         users.saveSessionData(session);
@@ -45,18 +54,24 @@ public class UserRestCalls {
 
     @POST
     @Path("/register")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response register(String request) {
-        JSONObject userData = new JSONObject(request);
+        String req;
         User user;
-
         try {
-            user = users.register(userData.getString("username"),
-                    userData.getString("password"));
+            req = URLDecoder.decode(request, "UTF-8");
+            String[] data = req.split("&");
+            String username = data[0].substring(data[0].indexOf('=') + 1);
+            String password = data[1].substring(data[1].indexOf('=') + 1);
+
+            user = users.register(username, password);
         } catch (IllegalAccessException e) {
             return Response.status(412).build();
         } catch (IllegalArgumentException e) {
             return Response.status(400).build();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return Response.status(500).build();
         }
 
         Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
