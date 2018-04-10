@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS Think_a_bitDB;
-CREATE DATABASE Think_a_bitDB;
+CREATE DATABASE Think_a_bitDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE Think_a_bitDB;
 
 CREATE TABLE Users (

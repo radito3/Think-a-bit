@@ -8,7 +8,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -51,9 +50,7 @@ public class UserRestCalls {
         NewCookie cookie = new NewCookie("sessionId", String.valueOf(session.getSessionId()),
                 "/Think-a-bit","localhost",1,"",1800,
                 new Date(System.currentTimeMillis() + (1800 * 1000)),false,true);
-        Cookie cookie1 = new Cookie("sessionId", String.valueOf(session.getSessionId()),"/Think-a-bit",
-                "localhost",1);
-        return Response.status(200).cookie(new NewCookie(cookie1)).build();
+        return Response.status(200).cookie(cookie).build();
     }
 
     @POST

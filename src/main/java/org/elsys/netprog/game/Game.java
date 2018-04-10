@@ -90,12 +90,4 @@ public interface Game {
     default int getUserId(UUID sessionId) {
         return DatabaseUtil.getInstance().getObject(s -> s.get(Sessions.class, sessionId)).getUserId();
     }
-
-    /**
-     * Check whether the current session has expired or not
-     *
-     * @param value The {@link javax.ws.rs.core.Cookie} value
-     * @return {@code true} If the session has expired, {@code false} otherwise
-     */
-    boolean hasSessionExpired(String value);
 }

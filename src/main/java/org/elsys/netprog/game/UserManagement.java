@@ -4,7 +4,6 @@ import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.Sessions;
 import org.elsys.netprog.model.User;
 
-import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 public class UserManagement implements UserOperations {
@@ -61,6 +60,7 @@ public class UserManagement implements UserOperations {
 
     @Override
     public void saveSessionData(final Sessions session) {
+        // does not delete session that have already expired
         db.processObject(s -> s.save(session));
     }
 
