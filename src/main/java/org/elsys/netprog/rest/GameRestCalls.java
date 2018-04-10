@@ -10,11 +10,8 @@ import org.json.JSONObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -46,7 +43,7 @@ public class GameRestCalls {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategory(@PathParam("categoryId") int categoryId,
                                 @CookieParam("sessionId") Cookie cookie) {
-        if (cookie == null/* || cookie.getExpiry().before(Date.from(Instant.now()))*/) {
+        if (cookie == null || game.hasSessionExpired(cookie.getValue())) {
             return Response.status(401).build();
         }
 
@@ -61,7 +58,7 @@ public class GameRestCalls {
     public Response getStageQuestions(@DefaultValue("1") @QueryParam("stageId") int stageId,
                                       @DefaultValue("1") @QueryParam("categoryId") int categoryId,
                                       @CookieParam("sessionId") Cookie cookie) {
-        if (cookie == null) { //or  is session has expired
+        if (cookie == null || game.hasSessionExpired(cookie.getValue())) {
             return Response.status(401).build();
         }
         int userId = game.getUserId(UUID.fromString(cookie.getValue()));
@@ -81,7 +78,7 @@ public class GameRestCalls {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response buyStageAttempts(String request, @CookieParam("sessionId") Cookie cookie) {
-        if (cookie == null) { //or is session has expired
+        if (cookie == null || game.hasSessionExpired(cookie.getValue())) {
             return Response.status(401).build();
         }
 
@@ -105,7 +102,7 @@ public class GameRestCalls {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response submitAnswers(String request, @CookieParam("sessionId") Cookie cookie) {
-        if (cookie == null) { //or is session has expired
+        if (cookie == null || game.hasSessionExpired(cookie.getValue())) {
             return Response.status(401).build();
         }
 

@@ -43,10 +43,11 @@ public class HelloWorld {
     @Path("/2")
     @Produces(MediaType.TEXT_PLAIN)
     public Response test() {
-        Supplier<Stream<String>> supplier = () -> Stream.of("test");
+        Supplier<Stream<String>> supplier = () -> Stream.of("test", "two").filter(s -> !s.equals("two"));
         Stream<String> stream = supplier.get();
         Stream<String> stream1 = supplier.get();
         long c = stream.count();
-        return Response.ok().entity(stream1.count()).build();
+        long c1 = stream1.count();
+        return Response.ok().entity("str1 length: " + c + ", str2 length: " + c1).build();
     }
 }

@@ -75,4 +75,13 @@ public class Stages implements Serializable {
     public int hashCode() {
         return Objects.hash(Id, CategoryId, Number);
     }
+
+    @Override
+    public String toString() {
+        return "Stages{" +
+                "Id=" + Id +
+                ", CategoryId=" + CategoryId +
+                ", Number=" + Number +
+                '}';
+    }
 }

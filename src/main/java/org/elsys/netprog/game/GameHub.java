@@ -2,14 +2,15 @@ package org.elsys.netprog.game;
 
 import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.*;
+import org.hibernate.query.Query;
+import org.hibernate.query.internal.QueryImpl;
 
-import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -45,10 +46,13 @@ public class GameHub implements Game {
 
     @Override
     public List<Categories> getCategories() {
-        Long categories = (Long) db.getObject(s ->
-                s.createQuery("SELECT COUNT(*) FROM Categories").uniqueResult());
-        return IntStream.rangeClosed(1, Integer.parseInt(categories.toString())).mapToObj(i ->
-                db.getObject(s -> s.get(Categories.class, i))).collect(Collectors.toList());
+        return db.getObject(s -> s.createQuery("FROM Categories").list());
+    }
+
+    @Override
+    public boolean hasSessionExpired(String value) {
+        //TODO implement
+        return false;
     }
 
     @Override
@@ -56,6 +60,17 @@ public class GameHub implements Game {
         Categories category = db.getObject(s -> s.get(Categories.class, categoryId));
 
         db.processObject(s -> s.saveOrUpdate(new UserProgress(userId, category.getId())));
+
+//        Stream<Stages> stream = db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " +
+//                category.getId()).getResultStream());
+//        stream.forEach(System.out::println);
+//
+//        Stream<Stages> stagesStream = Arrays.stream(stream.toArray(Stages[]::new));
+//        Supplier<Stream<Stages>> stages = () -> Stream.of(new Stages(), new Stages());
+//
+//        stages.get().forEach(s -> db.processObject(i -> i.saveOrUpdate(new StageAttempts(s.getId(),
+//                userId, categoryId))));
+
         List<Stages> stages = db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " +
                 category.getId()).list());
         stages.forEach(s -> db.processObject(i -> i.saveOrUpdate(new StageAttempts(s.getId(), userId, categoryId))));
@@ -66,28 +81,46 @@ public class GameHub implements Game {
     private StringBuilder buildCategoryJson(int categoryId, int userId, Categories category) {
         StringBuilder json = new StringBuilder("{\"name\":\"" + category.getName() + "\",\"stages\":[");
 
-        Long stages = (Long) db.getObject(s ->
-                s.createQuery("SELECT COUNT(*) FROM Stages WHERE CategoryId = " + categoryId).uniqueResult());
+        Stream<Stages> stages = db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " +
+                        category.getId()).getResultStream());
 
-        IntStream.rangeClosed(1, Integer.parseInt(stages.toString()))
-                .mapToObj(i -> db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " + categoryId)
-                        .setFirstResult(i - 1).list()))
-                .map(o -> (List<Stages>)o)
-                .forEach(stages1 -> {
-                    Stages stage = stages1.get(0);
-                    UserProgress up = db.getObject(s -> s.get(UserProgress.class,
-                            new UserProgress(userId, categoryId)));
-                    boolean isReached = up.getReachedStage() == stage.getNumber();
-                    StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
-                            new StageAttempts(stage.getId(), userId, categoryId)));
-                    long seconds = stageAvailability(sa);
+        stages.forEach(stage -> {
+            UserProgress up = db.getObject(s -> s.get(UserProgress.class,
+                    new UserProgress(userId, categoryId)));
+            boolean isReached = up.getReachedStage() == stage.getNumber();
+            StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
+                    new StageAttempts(stage.getId(), userId, categoryId)));
+            long seconds = stageAvailability(sa);
 
-                    json.append("{\"id\":").append(stage.getId())
-                            .append(",\"isReached\":").append(isReached)
-                            .append(",\"attempts\":").append(sa.getAttempts())
-                            .append(",\"availableAfter\":").append(seconds)
-                            .append("},");
-                });
+            json.append("{\"id\":").append(stage.getId())
+                    .append(",\"isReached\":").append(isReached)
+                    .append(",\"attempts\":").append(sa.getAttempts())
+                    .append(",\"availableAfter\":").append(seconds)
+                    .append("},");
+        });
+
+//        Long stages = (Long) db.getObject(s ->
+//                s.createQuery("SELECT COUNT(*) FROM Stages WHERE CategoryId = " + categoryId).uniqueResult());
+//
+//        IntStream.rangeClosed(1, Integer.parseInt(stages.toString()))
+//                .mapToObj(i -> db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " + categoryId)
+//                        .setFirstResult(i - 1).list()))
+//                .map(o -> (List<Stages>)o)
+//                .forEach(stages1 -> {
+//                    Stages stage = stages1.get(0);
+//                    UserProgress up = db.getObject(s -> s.get(UserProgress.class,
+//                            new UserProgress(userId, categoryId)));
+//                    boolean isReached = up.getReachedStage() == stage.getNumber();
+//                    StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
+//                            new StageAttempts(stage.getId(), userId, categoryId)));
+//                    long seconds = stageAvailability(sa);
+//
+//                    json.append("{\"id\":").append(stage.getId())
+//                            .append(",\"isReached\":").append(isReached)
+//                            .append(",\"attempts\":").append(sa.getAttempts())
+//                            .append(",\"availableAfter\":").append(seconds)
+//                            .append("},");
+//                });
         json.deleteCharAt(json.lastIndexOf(","));
         json.append("]}");
 
@@ -134,7 +167,7 @@ public class GameHub implements Game {
         }
     }
 
-    private @NotNull StringBuilder buildStageJson(int categoryId, int stageId, Stages stage) {
+    private StringBuilder buildStageJson(int categoryId, int stageId, Stages stage) {
         StringBuilder json = new StringBuilder("{\"category\":{\"id\":");
         Categories category = db.getObject(s -> s.get(Categories.class, categoryId));
 
