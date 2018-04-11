@@ -94,6 +94,8 @@ public class GameRestCalls {
             numAttempts = game.buyAttempts(stageId, userId, categoryId);
         } catch (IllegalAccessException e) {
             return Response.status(403).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(400).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
         }
 
         return Response.status(200).entity("{\"attempts\":\"" + numAttempts + "\"}").build();

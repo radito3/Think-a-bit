@@ -224,6 +224,9 @@ public class GameHub implements Game {
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
         StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                 new StageAttempts(stageId, userId, categoryId)));
+        if (sa == null) {
+            throw new IllegalArgumentException("Wrong stage Id for this category");
+        }
         UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
 
         if (up.getReachedStage() < stage.getNumber()) { //check if stage is unlocked
@@ -233,6 +236,6 @@ public class GameHub implements Game {
         sa.setAttempts(FIRST_STAGE_ATTEMPTS - (stage.getNumber() - 1));
         db.processObject(s -> s.update(sa));
 
-        return FIRST_STAGE_ATTEMPTS - stage.getNumber();
+        return FIRST_STAGE_ATTEMPTS - (stage.getNumber() - 1);
     }
 }
