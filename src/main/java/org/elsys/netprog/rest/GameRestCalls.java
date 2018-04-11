@@ -31,7 +31,7 @@ public class GameRestCalls {
         try {
             output = JsonWrapper.getJsonFromObject(game.getCategories());
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return Response.status(500).build();
         }
 
@@ -68,6 +68,8 @@ public class GameRestCalls {
             output = game.playStage(stageId, userId, categoryId);
         } catch (IllegalStateException e) {
             return Response.status(403).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(400).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
         }
 
         return Response.status(200).entity(output).build();
@@ -142,7 +144,7 @@ public class GameRestCalls {
                 String[] array = supplier.get().map(Question::getTitle).toArray(String[]::new);
                 output = "{\"wrongQuestions\":" + JsonWrapper.getJsonFromObject(array) + "}";
             } catch (IOException e) {
-                System.err.println(e.getMessage());
+                e.printStackTrace();
                 return Response.status(500).build();
             }
         }

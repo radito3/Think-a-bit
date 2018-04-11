@@ -13,7 +13,7 @@ public class Question implements Serializable {
     private int Id;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "mysql->enum('CLOSED_ONE', 'CLOSED_MANY', 'OPEN')", name = "Title", nullable = false)
+    @Column(columnDefinition = "mysql->enum('CLOSED_ONE', 'CLOSED_MANY', 'OPEN')", name = "Type", nullable = false)
     private Type Type;
 
     @Column(columnDefinition = "mysql->text", name = "Title", nullable = false, insertable = false, updatable = false)

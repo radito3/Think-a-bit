@@ -6,6 +6,7 @@ import org.elsys.netprog.model.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -101,16 +102,16 @@ public class GameHub implements Game {
     @Override
     public String playStage(int stageId, int userId, int categoryId) {
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
-        StageAttempts sa;
-        try {
-            sa = db.getObject(s -> s.get(StageAttempts.class, new StageAttempts(stage.getId(), userId, categoryId)));
-        } catch (Exception e) {
-            sa = new StageAttempts(stage.getId(), userId, categoryId);
+        StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
+                new StageAttempts(stage.getId(), userId, categoryId)));
+        if (sa == null) {
+            throw new IllegalArgumentException("Wrong stage Id for this category");
         }
+
         UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
 
         if (stage.getNumber() <= up.getReachedStage() && stageAvailability(sa) == 0) {
-            sa.setAttempts(FIRST_STAGE_ATTEMPTS - stage.getNumber());
+            sa.setAttempts(FIRST_STAGE_ATTEMPTS - (stage.getNumber() - 1));
             final StageAttempts temp = sa;
             db.processObject(s -> s.saveOrUpdate(temp));
             setStageQuestions(stage);
@@ -139,7 +140,8 @@ public class GameHub implements Game {
                     s.createQuery("FROM Answers WHERE QuestionId = " + question.getId()).list());
             answers.forEach(answer ->
                     json.append("{\"content\":\"").append(answer.getPayload())
-                    .append("\",\"isCorrect\":").append(answer.getIsCorrect()).append("},"));
+                    .append("\",\"isCorrect\":").append(answer.getIsCorrect()).append("},")
+            );
             json.deleteCharAt(json.lastIndexOf(","));
             json.append("]},");
         });
@@ -150,10 +152,12 @@ public class GameHub implements Game {
     }
 
     private void setStageQuestions(Stages stage) {
-        stage.setQuestions(db.getObject(s ->
-                s.createQuery("FROM Question RIGHT JOIN QuestionStages " +
-                        "ON Question.Id = QuestionStages.QuestionId WHERE QuestionStages.StageId = " +
-                        stage.getId()).list()));
+        List<QuestionStages> questionStages = db.getObject(s -> s.createQuery("FROM QuestionStages " +
+                "WHERE StageId = " + stage.getId()).getResultList());
+        List<Question> questions = new LinkedList<>();
+
+        questionStages.forEach(qs -> questions.add(db.getObject(s -> s.get(Question.class, qs.getQuestionId()))));
+        stage.setQuestions(questions);
     }
 
     @Override
@@ -166,7 +170,7 @@ public class GameHub implements Game {
             up.setReachedStage(up.getReachedStage() + 1);
             db.processObject(s -> s.update(up));
 
-            sa.setAttempts(FIRST_STAGE_ATTEMPTS - currentStage.getNumber());
+            sa.setAttempts(FIRST_STAGE_ATTEMPTS - (currentStage.getNumber() - 1));
         } else {
             sa.setAttempts(sa.getAttempts() - 1);
         }
@@ -226,7 +230,7 @@ public class GameHub implements Game {
             throw new IllegalAccessException("Stage is locked");
         }
 
-        sa.setAttempts(FIRST_STAGE_ATTEMPTS - stage.getNumber());
+        sa.setAttempts(FIRST_STAGE_ATTEMPTS - (stage.getNumber() - 1));
         db.processObject(s -> s.update(sa));
 
         return FIRST_STAGE_ATTEMPTS - stage.getNumber();

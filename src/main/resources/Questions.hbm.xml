@@ -14,7 +14,9 @@
             <generator class = "native"/>
         </id>
 
-        <property name = "Type" column = "Type" type = "string"/>
+        <property name = "Type" column = "Type" type = "org.hibernate.type.EnumType">
+            <type name="org.elsys.netprog.model.Question$Type"/>
+        </property>
         <property name = "Title" column = "Title" type = "string"/>
 
     </class>
