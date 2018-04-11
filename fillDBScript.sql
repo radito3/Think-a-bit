@@ -103,7 +103,7 @@ INSERT INTO Question (Type, Title) VALUES ("CLOSED_ONE", "What is the distance b
     ("CLOSED_ONE", "What is an imaginary number?"),
     ("CLOSED_ONE", "13 * 14 ="),
     ("CLOSED_ONE", "What is the equation for the circumference of a circle?"),
-    ("CLOSED_ONE", "What is the square root of 125?"),
+    ("CLOSED_ONE", "What is the cube root of 125?"),
     ("CLOSED_ONE", "19 + … = 42"),
     ("CLOSED_MANY", "Which of the following statements about methods are true?"),
     ("CLOSED_ONE", "A long rope has to be cut to make 23 small pieces. If it is double folded to start with how many times does it need to be cut?"),
