@@ -121,18 +121,22 @@ public class GameRestCalls {
 
         JSONArray qAndA = json.getJSONArray("results");
         List<JSONObject> entities = new LinkedList<>();
-        for (Object entity : qAndA) {
-            entities.add(new JSONObject(entity));
+        for (int i = 0; i < qAndA.length(); i++) {
+            entities.add(qAndA.getJSONObject(i));
         }
 
-        entities.forEach(ent -> {
-            Question question = new Question(ent.getInt("questionId"),
-                    Question.Type.valueOf(ent.getString("questionType")),
-                    ent.getString("questionTitle"));
-            List<Object> answers = ent.getJSONArray("answers").toList();
-            String[] answ = answers.stream().toArray(String[]::new);
-            game.answerQuestion(question, stageId, answ);
-        });
+        try {
+            entities.forEach(ent -> {
+                Question question = new Question(ent.getInt("questionId"),
+                        Question.Type.valueOf(ent.getString("questionType")),
+                        ent.getString("questionTitle"));
+                List<Object> answers = ent.getJSONArray("answers").toList();
+                String[] answ = answers.stream().toArray(String[]::new);
+                game.answerQuestion(question, stageId, answ);
+            });
+        } catch (IndexOutOfBoundsException e) {
+            return Response.status(400).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
+        }
 
         game.checkIfCurrentStageIsComplete(userId, categoryId, stageId);
 

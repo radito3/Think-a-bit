@@ -4,6 +4,7 @@ import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.*;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -50,30 +51,38 @@ public class GameHub implements Game {
     public String playCategory(int categoryId, int userId) {
         Categories category = db.getObject(s -> s.get(Categories.class, categoryId));
 
-        db.processObject(s -> s.saveOrUpdate(new UserProgress(userId, category.getId())));
+        UserProgress up = new UserProgress(userId, category.getId());
+        if (db.getObject(s -> s.get(UserProgress.class, up)) == null) {
+            db.processObject(s -> s.save(up));
+        }
 
         List<Stages> stages = db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " +
-                category.getId()).list());
-        stages.forEach(s -> db.processObject(i -> i.saveOrUpdate(new StageAttempts(s.getId(), userId, categoryId))));
+                category.getId()).getResultList());
+        List<StageAttempts> stageAttempts = new LinkedList<>();
 
-        return buildCategoryJson(categoryId, userId, category, stages).toString();
+        stages.forEach(s -> stageAttempts.add(db.getObject(i -> i.get(StageAttempts.class,
+                new StageAttempts(s.getId(), userId, categoryId)))));
+        if (stageAttempts.get(0) == null) {
+            stages.forEach(st -> db.processObject(s -> s.save(new StageAttempts(st.getId(), userId, categoryId))));
+        }
+
+        return buildCategoryJson(categoryId, userId, up, category, stages).toString();
     }
 
-    private StringBuilder buildCategoryJson(int categoryId, int userId, Categories category, List<Stages> stages) {
+    private StringBuilder buildCategoryJson(int categoryId, int userId, UserProgress up, Categories category,
+                                            List<Stages> stages) {
         StringBuilder json = new StringBuilder("{\"name\":\"" + category.getName() + "\",\"stages\":[");
 
         stages.forEach(stage -> {
-            UserProgress up = db.getObject(s -> s.get(UserProgress.class,
-                    new UserProgress(userId, categoryId)));
-            boolean isReached = up.getReachedStage() == stage.getNumber();
+            boolean isReached = up.getReachedStage() >= stage.getNumber();
             StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                     new StageAttempts(stage.getId(), userId, categoryId)));
-            long seconds = stageAvailability(sa);
+            assert sa != null;
 
             json.append("{\"id\":").append(stage.getId())
                     .append(",\"isReached\":").append(isReached)
                     .append(",\"attempts\":").append(sa.getAttempts())
-                    .append(",\"availableAfter\":").append(seconds)
+                    .append(",\"availableAfter\":").append(stageAvailability(sa))
                     .append("},");
         });
 
@@ -82,21 +91,14 @@ public class GameHub implements Game {
         return json;
     }
 
-    private long stageAvailability(final StageAttempts sa) {
-        long seconds = 0;
-        if (sa.getLastAttempt() != null) {
-            seconds = (sa.getLastAttempt().getTime() + 1800L) -
-                    Timestamp.from(Instant.now()).getTime();
-            seconds = seconds < 0 ? 0 : seconds;
-        }
-        return seconds;
-    }
-
     @Override
     public boolean checkIfStageIsAvailable(int stageId, int userId, int categoryId) {
         StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                 new StageAttempts(stageId, userId, categoryId)));
-        return stageAvailability(sa) == 0;
+        UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
+        Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
+        return sa != null && up != null && stage != null &&
+                stage.getNumber() <= up.getReachedStage() && stageAvailability(sa) == 0;
     }
 
     @Override
@@ -151,6 +153,15 @@ public class GameHub implements Game {
         return json;
     }
 
+    private static long stageAvailability(final StageAttempts sa) {
+        if (sa.getLastAttempt() == null) {
+            return 0;
+        }
+        long time;
+        return (time = -Duration.between(sa.getLastAttempt().toInstant().plusSeconds(180), Instant.now()).getSeconds())
+                <= 0 ? 0 : time;
+    }
+
     private void setStageQuestions(Stages stage) {
         List<QuestionStages> questionStages = db.getObject(s -> s.createQuery("FROM QuestionStages " +
                 "WHERE StageId = " + stage.getId()).getResultList());
@@ -164,24 +175,29 @@ public class GameHub implements Game {
     public void checkIfCurrentStageIsComplete(int userId, int categoryId, int stageId) {
         StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                 new StageAttempts(stageId, userId, categoryId)));
+        Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
 
         if (currentStage.getQuestions().stream().allMatch(Question::isSolved)) {
             UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
-            up.setReachedStage(up.getReachedStage() + 1);
+            up.setReachedStage(stage.getNumber() + 1);
             db.processObject(s -> s.update(up));
+            //TODO set next stage attempts
 
             sa.setAttempts(FIRST_STAGE_ATTEMPTS - (currentStage.getNumber() - 1));
         } else {
             sa.setAttempts(sa.getAttempts() - 1);
         }
-        currentStage = null;
 
         sa.setLastAttempt(Timestamp.from(Instant.now()));
         db.processObject(s -> s.update(sa));
     }
 
     private int getQuestionIndex(Question question) {
-        return currentStage.getQuestions().indexOf(question);
+        int index;
+        if ((index = currentStage.getQuestions().indexOf(question)) == -1) {
+            throw new IndexOutOfBoundsException("Wrong questions for this stage");
+        }
+        return index;
     }
 
     @Override
@@ -199,6 +215,8 @@ public class GameHub implements Game {
 
             if (allAnswers.reduce((a, b) -> a.equals(b) ? "" : a).get().length() == 0) {
                 currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(true);
+            } else {
+                currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(false);
             }
         } else {
             Answers correct = (Answers) db.getObject(s ->
@@ -206,6 +224,8 @@ public class GameHub implements Game {
 
             if (correct.getPayload().equals(answers[0])) {
                 currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(true);
+            } else {
+                currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(false);
             }
         }
     }
@@ -229,7 +249,7 @@ public class GameHub implements Game {
         }
         UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
 
-        if (up.getReachedStage() < stage.getNumber()) { //check if stage is unlocked
+        if (up.getReachedStage() < stage.getNumber() || stageAvailability(sa) > 0) {
             throw new IllegalAccessException("Stage is locked");
         }
 

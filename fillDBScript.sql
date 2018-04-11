@@ -103,7 +103,7 @@ INSERT INTO Question (Type, Title) VALUES ("CLOSED_ONE", "What is the distance b
     ("CLOSED_ONE", "What is an imaginary number?"),
     ("CLOSED_ONE", "13 * 14 ="),
     ("CLOSED_ONE", "What is the equation for the circumference of a circle?"),
-    ("CLOSED_ONE", "What is the cube root of 125?"),
+    ("CLOSED_ONE", "What is the square root of 125?"),
     ("CLOSED_ONE", "19 + … = 42"),
     ("CLOSED_MANY", "Which of the following statements about methods are true?"),
     ("CLOSED_ONE", "A long rope has to be cut to make 23 small pieces. If it is double folded to start with how many times does it need to be cut?"),
@@ -152,7 +152,8 @@ INSERT INTO Question (Type, Title) VALUES ("CLOSED_ONE", "What is the distance b
     ("CLOSED_ONE", "Why was the language called 'Python'?"),
     ("CLOSED_ONE", "Which tag may be used to indicate a comment in your PHP code?"),
     ("CLOSED_ONE", "To add 1 to the variable $myNum, use the following:"),
-    ("CLOSED_ONE", "What is email spoofing?");
+    ("CLOSED_ONE", "What is email spoofing?"),
+    ("OPEN", "What year was ITF Taekwon-Do founded?");
 
 INSERT INTO Categories (Name) VALUES ("Astronomy"),
 ("Biology"),
@@ -979,7 +980,8 @@ VALUES
 (155, "Placing links to malicious web sites in the email message", 0),
 (155, "Sending bulk commercial email to many recipients at once", 0),
 (155, "Sending unsolicited email", 0),
-(155, "The sender crafts a message header to make an email appear to come from a trusted sender", 1);
+(155, "The sender crafts a message header to make an email appear to come from a trusted sender", 1),
+(156, "1966", 1);
 
 INSERT INTO QuestionStages(QuestionId, StageId) VALUES (1, 1),
 (2, 1),
