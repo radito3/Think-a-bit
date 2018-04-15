@@ -9,8 +9,8 @@ import {
 } from "material-ui";
 import { addCategories, removeCategories } from "../store/actions/categories";
 import { selectCategory } from "../store/actions/stages";
-import { logout } from "../store/actions/authentication";
 import config from "../config.json";
+import LogoutButton from "./logout-button.jsx";
 
 class SideMenuOptions extends React.Component {
     constructor(props) {
@@ -46,7 +46,7 @@ class SideMenuOptions extends React.Component {
             <div>
                 <Subheader>{this.props.authentication.username}</Subheader>
                 <MenuItem>Account settings</MenuItem>
-                <MenuItem onClick={() => this.props.logout()}>Log out</MenuItem>
+                <LogoutButton type="menuitem" />
                 <Divider />
                 <Subheader style={{
                     "fontSize": "30px"
@@ -69,5 +69,4 @@ export default withRouter(connect(store => {
     addCategories,
     removeCategories,
     selectCategory,
-    logout
 })(SideMenuOptions));

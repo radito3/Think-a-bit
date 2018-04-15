@@ -9,7 +9,15 @@ function logout() {
     return { type: "LOGOUT" };
 }
 
+function setLoggingOut(isLoggingOut) {
+    return {
+        type: "SET_LOGGING_OUT",
+        payload: isLoggingOut
+    };
+}
+
 export {
     login,
-    logout
+    logout,
+    setLoggingOut
 };

@@ -5,8 +5,8 @@ import {
     AppBar,
     FlatButton
 } from "material-ui";
-import { logout } from "../store/actions/authentication";
 import { toggleSideMenu } from "../store/actions/side-menu";
+import LogoutButton from "./logout-button.jsx";
 
 class TopMenu extends React.Component {
     render() {
@@ -21,9 +21,8 @@ class TopMenu extends React.Component {
                     onClick={() => { }}
                     style={appBarButtonStyle}
                 />
-                <FlatButton
-                    label="Log out"
-                    onClick={() => this.props.logout()}
+                <LogoutButton
+                    type="flat"
                     style={appBarButtonStyle}
                 />
             </div> :
@@ -56,4 +55,4 @@ export default withRouter(connect(store => {
     return {
         authentication: store.authentication
     }
-}, { logout, toggleSideMenu })(TopMenu));
+}, { toggleSideMenu })(TopMenu));
