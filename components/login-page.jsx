@@ -1,10 +1,12 @@
 import React from "react";
-import { RaisedButton, TextField } from "material-ui";
-import ArrowForward from "material-ui/svg-icons/navigation/arrow-forward";
+import { TextField } from "material-ui";
 import { Grid, Row, Col } from "react-flexbox-grid";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { login } from "../store/actions/authentication";
+import formurlencoded from "form-urlencoded";
+import config from "../config";
+import FormSubmitButton from "./form-submit-button.jsx";
 
 class LoginPage extends React.Component {
     constructor(props) {
@@ -13,14 +15,50 @@ class LoginPage extends React.Component {
         this.state = {
             username: "",
             password: "",
+            isLoading: false
         };
+
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleSubmit() {
-        this.props.login({
-            username: this.state.username
+        const formData = {
+            username: this.state.username,
+            password: this.state.password
+        };
+
+        this.setState({
+            isLoading: true
         });
-        this.props.history.push("/categories");
+
+        fetch(`${config.url}:${config.port}/Think-a-bit/users/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded", },
+            body: formurlencoded(formData)
+        }).then(response => {
+            this.setState({
+                isLoading: false
+            });
+
+            if (response.status === 200) {
+                this.props.login({
+                    username: this.state.username
+                });
+                this.props.history.push("/categories");
+            } else if (response.status === 404) {
+                // todo: show error in user interface
+                console.log("Wrong credentials");
+            } else {
+                // todo: show error in user interface
+                console.log("An unknown error occured");
+            }
+        }).catch(error => {
+            this.setState({
+                isLoading: false
+            });
+
+            console.log(error);
+        })
     }
 
     render() {
@@ -42,12 +80,10 @@ class LoginPage extends React.Component {
                             onChange={(event, newValue) => this.setState({ password: newValue })}
                         />
                         <br />
-                        <RaisedButton
+                        <FormSubmitButton
                             label="Log in"
-                            labelPosition="before"
-                            primary={true}
-                            icon={<ArrowForward />}
-                            onClick={() => this.handleSubmit()}
+                            isLoading={this.state.isLoading}
+                            handleSubmit={this.handleSubmit}
                         />
                     </form>
                 </Col>
