@@ -13,20 +13,6 @@ class StagesPage extends React.Component {
     constructor(props) {
         super(props);
 
-        this.props.removeStages();
-
-        console.log(`${config.url}:${config.port}/Think-a-bit/game/category/${this.props.stages.selectedCategoryId}`);
-
-        fetch(
-            `${config.url}:${config.port}/Think-a-bit/game/category/${this.props.stages.selectedCategoryId}`
-        ).then(response => {
-            return response.json();
-        }).then(parsed => {
-            this.props.addStages(parsed.stages, parsed.name);
-            console.log(parsed);
-        }).catch(error => {
-            console.log(error);
-        });
     }
 
     render() {

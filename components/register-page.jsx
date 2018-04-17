@@ -34,6 +34,7 @@ class RegisterPage extends React.Component {
         fetch(`${config.url}:${config.port}/Think-a-bit/users/register`, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded", },
+            credentials: "same-origin",
             body: formurlencoded(formData)
         }).then(response => {
             this.setState({

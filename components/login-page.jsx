@@ -34,6 +34,8 @@ class LoginPage extends React.Component {
         fetch(`${config.url}:${config.port}/Think-a-bit/users/login`, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded", },
+            credentials: "same-origin",
+            mode: "same-origin",
             body: formurlencoded(formData)
         }).then(response => {
             this.setState({

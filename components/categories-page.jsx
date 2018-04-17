@@ -7,7 +7,8 @@ import {
     RaisedButton
 } from "material-ui";
 import StarBorder from "material-ui/svg-icons/toggle/star-border";
-import { selectCategory } from "../store/actions/stages";
+import { selectCategory, addStages } from "../store/actions/stages";
+import config from "../config";
 
 class CategoriesPage extends React.Component {
     constructor(props) {
@@ -15,8 +16,20 @@ class CategoriesPage extends React.Component {
     }
 
     handleCategoryClick(categoryId) {
-        this.props.selectCategory(categoryId);
-        this.props.history.push("/stages");
+        fetch(`${config.url}:${config.port}/Think-a-bit/game/category/${categoryId}`, {
+            method: "GET",
+            credentials: "same-origin"
+        }).then(response => {
+            console.log(response.status);
+            return response.json();
+        }).then(parsed => {
+            console.log(parsed);
+            this.props.addStages(parsed.stages, parsed.name);
+            this.props.selectCategory(categoryId);
+            this.props.history.push("/stages");
+        }).catch(error => {
+            console.log(error);
+        });
     }
 
     render() {
@@ -71,4 +84,4 @@ export default withRouter(connect(store => {
         categories: store.categories.categories,
         authentication: store.authentication
     };
-}, { selectCategory })(CategoriesPage));
+}, { selectCategory, addStages })(CategoriesPage));
