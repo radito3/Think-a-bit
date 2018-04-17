@@ -25,65 +25,66 @@ class QuestionPage extends React.Component {
     constructor(props) {
         super(props);
 
-        this.props.addQuestions([
-            {
-                title: "What does the fox say?",
-                type: "CLOSED_MANY",
-                answers: [
-                    {
-                        content: "Meaw",
-                        isSelected: false
-                    },
-                    {
-                        content: "Woof",
-                        isSelected: false
-                    },
-                    {
-                        content: "Hiss",
-                        isSelected: false
-                    },
-                    {
-                        content: "Wreack",
-                        isSelected: false
-                    },
-                    {
-                        content: "Cough",
-                        isSelected: false
-                    }
-                ]
-            },
-            {
-                title: "When did WW1 begin?",
-                type: "CLOSED_ONE",
-                answers: [
-                    {
-                        content: "1912",
-                        isSelected: false
-                    },
-                    {
-                        content: "1913",
-                        isSelected: false
-                    },
-                    {
-                        content: "1914",
-                        isSelected: false
-                    },
-                    {
-                        content: "1915",
-                        isSelected: false
-                    }
-                ]
-            },
-            {
-                title: "When was Queen Elizabeth II born?",
-                type: "OPEN",
-                answer: ""
-            },
-            {
-                title: "Can Chuck Norris break this site?"
-            }
-        ]);
+        // this.props.addQuestions([
+        //     {
+        //         title: "What does the fox say?",
+        //         type: "CLOSED_MANY",
+        //         answers: [
+        //             {
+        //                 content: "Meaw",
+        //                 isSelected: false
+        //             },
+        //             {
+        //                 content: "Woof",
+        //                 isSelected: false
+        //             },
+        //             {
+        //                 content: "Hiss",
+        //                 isSelected: false
+        //             },
+        //             {
+        //                 content: "Wreack",
+        //                 isSelected: false
+        //             },
+        //             {
+        //                 content: "Cough",
+        //                 isSelected: false
+        //             }
+        //         ]
+        //     },
+        //     {
+        //         title: "When did WW1 begin?",
+        //         type: "CLOSED_ONE",
+        //         answers: [
+        //             {
+        //                 content: "1912",
+        //                 isSelected: false
+        //             },
+        //             {
+        //                 content: "1913",
+        //                 isSelected: false
+        //             },
+        //             {
+        //                 content: "1914",
+        //                 isSelected: false
+        //             },
+        //             {
+        //                 content: "1915",
+        //                 isSelected: false
+        //             }
+        //         ]
+        //     },
+        //     {
+        //         title: "When was Queen Elizabeth II born?",
+        //         type: "OPEN",
+        //         answer: ""
+        //     },
+        //     {
+        //         title: "Can Chuck Norris break this site?"
+        //     }
+        // ]);
     }
+
     render() {
         let answer;
         switch (this.props.questions.questions[this.props.questions.currentQuestionIndex].type) {

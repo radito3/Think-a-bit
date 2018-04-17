@@ -6,13 +6,38 @@ import {
     GridList,
     RaisedButton
 } from "material-ui";
-import { addStages, removeStages } from "../store/actions/stages";
+import { addQuestions } from "../store/actions/questions";
 import config from "../config.json";
 
 class StagesPage extends React.Component {
     constructor(props) {
         super(props);
 
+    }
+
+    handleStageClick(stageId) {
+        fetch(`${config.url}:${config.port}/Think-a-bit/game/stage?stageId=${stageId}&categoryId=${this.props.stages.selectedCategoryId}`, {
+            method: "GET",
+            credentials: "same-origin"
+        }).then(response => {
+            if (response.status === 401) {
+                console.log("Session expored");
+            } else if (response.status === 403) {
+                console.log("Stage unavailable");
+            } else if (response.status === 500) {
+                console.log("Internal server error");
+            } else if (response.status === 200) {
+                return response.json();
+            } else {
+                console.log("Unknown error");
+            }
+        }).then(parsed => {
+            console.log(parsed);
+            this.props.addQuestions(parsed.questions);
+            this.props.history.push("/question");
+        }).catch(error => {
+            console.log(error);
+        });
     }
 
     render() {
@@ -44,7 +69,7 @@ class StagesPage extends React.Component {
                                 "height": "100%",
                                 "width": "100%"
                             }}
-                            onClick={() => { }}
+                            onClick={() => this.handleStageClick.bind(this, stage.id)()}
                         >
                             {stage.id}
                         </RaisedButton>
@@ -62,4 +87,4 @@ export default withRouter(connect(store => {
     return {
         stages: store.stages
     };
-}, { addStages, removeStages })(StagesPage));
+}, { addQuestions })(StagesPage));
