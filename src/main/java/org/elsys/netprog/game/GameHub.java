@@ -178,7 +178,6 @@ public class GameHub implements Game {
         List<Question> questions = new LinkedList<>();
 
         questionStages.forEach(qs -> questions.add(db.getObject(s -> s.get(Question.class, qs.getQuestionId()))));
-        questions.forEach(q -> System.out.println(q.getTitle()));
         stage.setQuestions(questions);
     }
 
@@ -270,8 +269,10 @@ public class GameHub implements Game {
         if (sa == null) {
             throw new IllegalArgumentException("Wrong stage Id for this category");
         }
-        UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
-        //need to check if up is not null
+        UserProgress up;
+        if ((up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)))) == null) {
+            up = new UserProgress(userId, categoryId);
+        } //needs refactoring
 
         if (up.getReachedStage() < stage.getNumber() || stageAvailability(sa) > 0) {
             throw new IllegalAccessException("Stage is locked");
