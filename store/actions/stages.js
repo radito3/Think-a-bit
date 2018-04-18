@@ -16,8 +16,13 @@ function removeStages() {
     return { type: "REMOVE_STAGES" };
 }
 
+function decrementAvailableAfter() {
+    return { type: "DECREMENT_AVAILABLE_AFTER" };
+}
+
 export {
     addStages,
     removeStages,
-    selectCategory
+    selectCategory,
+    decrementAvailableAfter
 };

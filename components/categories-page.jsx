@@ -8,6 +8,7 @@ import {
 } from "material-ui";
 import StarBorder from "material-ui/svg-icons/toggle/star-border";
 import { selectCategory, addStages } from "../store/actions/stages";
+import { setSessionExpired } from "../store/actions/authentication";
 import config from "../config";
 
 class CategoriesPage extends React.Component {
@@ -20,8 +21,14 @@ class CategoriesPage extends React.Component {
             method: "GET",
             credentials: "same-origin"
         }).then(response => {
-            console.log(response.status);
-            return response.json();
+            if (response.status === 401) {
+                this.props.setSessionExpired(true);
+            } else if (response.status === 200) {
+                return response.json();
+            } else {
+                console.log("Unknown error");
+                console.log(response.status);
+            }
         }).then(parsed => {
             console.log(parsed);
             this.props.addStages(parsed.stages, parsed.name);
@@ -84,4 +91,4 @@ export default withRouter(connect(store => {
         categories: store.categories.categories,
         authentication: store.authentication
     };
-}, { selectCategory, addStages })(CategoriesPage));
+}, { selectCategory, addStages, setSessionExpired })(CategoriesPage));

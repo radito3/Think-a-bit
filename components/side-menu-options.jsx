@@ -9,6 +9,7 @@ import {
 } from "material-ui";
 import { addCategories, removeCategories } from "../store/actions/categories";
 import { selectCategory, addStages } from "../store/actions/stages";
+import { setSessionExpired } from "../store/actions/authentication";
 import config from "../config.json";
 import LogoutButton from "./logout-button.jsx";
 
@@ -32,8 +33,14 @@ class SideMenuOptions extends React.Component {
             method: "GET",
             credentials: "same-origin"
         }).then(response => {
-            console.log(response.status);
-            return response.json();
+            if (response.status === 401) {
+                this.props.setSessionExpired(true);
+            } else if (response.status === 200) {
+                return response.json();
+            } else {
+                console.log("Unknown error");
+                console.log(response.status);
+            }
         }).then(parsed => {
             console.log(parsed);
             this.props.addStages(parsed.stages, parsed.name);
@@ -81,5 +88,6 @@ export default withRouter(connect(store => {
     addCategories,
     removeCategories,
     selectCategory,
-    addStages
+    addStages,
+        setSessionExpired
 })(SideMenuOptions));
