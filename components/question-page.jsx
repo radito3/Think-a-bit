@@ -13,76 +13,53 @@ import NavigationExpandMoreIcon from "material-ui/svg-icons/navigation/expand-mo
 import ArrowBack from "material-ui/svg-icons/navigation/arrow-back";
 import ArrowForward from "material-ui/svg-icons/navigation/arrow-forward";
 import {
-    addQuestions,
     nextQuestion,
     previousQuestion
 } from "../store/actions/questions";
 import ClosedOneAnswer from "./closed-one-answer.jsx";
 import ClosedManyAnswer from "./closed-many-answer.jsx";
 import OpenAnswer from "./open-answer.jsx";
+import config from "../config";
 
 class QuestionPage extends React.Component {
     constructor(props) {
         super(props);
+    }
 
-        // this.props.addQuestions([
-        //     {
-        //         title: "What does the fox say?",
-        //         type: "CLOSED_MANY",
-        //         answers: [
-        //             {
-        //                 content: "Meaw",
-        //                 isSelected: false
-        //             },
-        //             {
-        //                 content: "Woof",
-        //                 isSelected: false
-        //             },
-        //             {
-        //                 content: "Hiss",
-        //                 isSelected: false
-        //             },
-        //             {
-        //                 content: "Wreack",
-        //                 isSelected: false
-        //             },
-        //             {
-        //                 content: "Cough",
-        //                 isSelected: false
-        //             }
-        //         ]
-        //     },
-        //     {
-        //         title: "When did WW1 begin?",
-        //         type: "CLOSED_ONE",
-        //         answers: [
-        //             {
-        //                 content: "1912",
-        //                 isSelected: false
-        //             },
-        //             {
-        //                 content: "1913",
-        //                 isSelected: false
-        //             },
-        //             {
-        //                 content: "1914",
-        //                 isSelected: false
-        //             },
-        //             {
-        //                 content: "1915",
-        //                 isSelected: false
-        //             }
-        //         ]
-        //     },
-        //     {
-        //         title: "When was Queen Elizabeth II born?",
-        //         type: "OPEN",
-        //         answer: ""
-        //     },
-        //     {
-        //         title: "Can Chuck Norris break this site?"
-        //     }
-        // ]);
+    submit() {
+        const submitBody = {
+            categoryId: this.props.stages.selectedCategoryId,
+            stageId: this.props.questions.currentStageId,
+            results: this.props.questions.questions.map(question => {
+                return {
+                    questionId: question.id,
+                    questionType: question.type,
+                    questionTitle: question.title,
+                    answers: question.answers.filter(answer => answer.isSelected).map(answer => answer.content)
+                };
+            })
+        }
+
+        fetch(`${config.url}:${config.port}/Think-a-bit/game/submit`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", },
+            credentials: "same-origin",
+            body: JSON.stringify(submitBody)
+        }).then(response => {
+            if (response.status === 401) {
+                console.log("Session expired");
+            } else if (response.status === 403) {
+                console.log("Stage unavailable");
+            } else if (response.status === 200) {
+                return response.json();
+            } else {
+                console.log("Unknown error");
+            }
+        }).then(parsed => {
+            console.log(parsed);
+        }).catch(error => {
+            console.log(error);
+        });
     }
 
     render() {
@@ -111,7 +88,7 @@ class QuestionPage extends React.Component {
             <Toolbar>
                 <ToolbarGroup firstChild>
                     <FlatButton
-                        onClick={() => { this.props.previousQuestion(); }}
+                        onClick={() => this.props.previousQuestion() }
                         target="_blank"
                         labelPosition="after"
                         label="Previous"
@@ -119,11 +96,15 @@ class QuestionPage extends React.Component {
                     />
                 </ToolbarGroup>
                 <ToolbarGroup>
-                    <FlatButton label="Finish" primary={true} />
+                    <FlatButton
+                        label="Finish"
+                        primary={true}
+                        onClick={() => this.submit() }
+                    />
                 </ToolbarGroup>
                 <ToolbarGroup lastChild>
                     <FlatButton
-                        onClick={() => { this.props.nextQuestion() }}
+                        onClick={() => this.props.nextQuestion() }
                         target="_blank"
                         labelPosition="before"
                         label="Next"
@@ -140,10 +121,10 @@ class QuestionPage extends React.Component {
 
 export default connect(store => {
     return {
-        questions: store.questions
+        questions: store.questions,
+        stages: store.stages
     };
 }, {
-    addQuestions,
     nextQuestion,
     previousQuestion
  })(QuestionPage);

@@ -1,21 +1,23 @@
-const reducer = (state = { questions: [], currentQuestionIndex: 0 }, action) => {
+const reducer = (state = { questions: [], currentStageId: 0, currentQuestionIndex: 0 }, action) => {
     switch (action.type) {
         case "ADD_QUESTIONS":
             return {
                 ...state,
-                questions: action.payload,
+                questions: action.payload.questions,
                 // .map(question => {
                 //     return {
                 //         ...question,
 
                 //     };
                 // }),
+                currentStageId: action.payload.stageId,
                 currentQuestionIndex: 0
             };
         case "REMOVE_QUESTIONS":
             return {
                 ...state,
                 questions: [],
+                currentStageId: 0,
                 currentQuestionIndex: 0
             };
         case "NEXT_QUESTION":

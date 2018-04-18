@@ -1,7 +1,7 @@
-function addQuestions(questions) {
+function addQuestions(questions, stageId) {
     return {
         type: "ADD_QUESTIONS",
-        payload: questions
+        payload: { questions, stageId }
     };
 }
 

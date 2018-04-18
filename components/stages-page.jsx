@@ -12,7 +12,6 @@ import config from "../config.json";
 class StagesPage extends React.Component {
     constructor(props) {
         super(props);
-
     }
 
     handleStageClick(stageId) {
@@ -21,11 +20,9 @@ class StagesPage extends React.Component {
             credentials: "same-origin"
         }).then(response => {
             if (response.status === 401) {
-                console.log("Session expored");
+                console.log("Session expired");
             } else if (response.status === 403) {
                 console.log("Stage unavailable");
-            } else if (response.status === 500) {
-                console.log("Internal server error");
             } else if (response.status === 200) {
                 return response.json();
             } else {
@@ -33,7 +30,7 @@ class StagesPage extends React.Component {
             }
         }).then(parsed => {
             console.log(parsed);
-            this.props.addQuestions(parsed.questions);
+            this.props.addQuestions(parsed.questions, stageId);
             this.props.history.push("/question");
         }).catch(error => {
             console.log(error);
