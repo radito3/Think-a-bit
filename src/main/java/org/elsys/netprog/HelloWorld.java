@@ -12,8 +12,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Path("/test")
@@ -57,8 +60,8 @@ public class HelloWorld {
     @Path("/3")
     @Produces(MediaType.TEXT_PLAIN)
     public Response test21() {
-        List<Stages> stages = DatabaseUtil.getInstance().getObject(s -> s.createQuery("FROM Stages WHERE " +
-                "CategoryId = " + 1 ).setFirstResult(2).getResultList());
-        return Response.status(200).entity(stages.get(0).getId()).build();
+        Stream<String> stream = Stream.of("one", "one", "two");
+        Set<String> strngs = new HashSet<>();
+        return Response.status(200).entity(stream.filter(s -> !strngs.add(s)).collect(Collectors.toSet()).size()).build();
     }
 }

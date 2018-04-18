@@ -61,7 +61,11 @@ public class UserManagement implements UserOperations {
     @Override
     public void saveSessionData(final Sessions session) {
         // does not delete session that have already expired
-        db.processObject(s -> s.save(session));
+        try {
+            db.processObject(s -> s.save(session));
+        } catch (Exception e) {
+            throw new RuntimeException("Unsuccessful login/register");
+        }
     }
 
     @Override

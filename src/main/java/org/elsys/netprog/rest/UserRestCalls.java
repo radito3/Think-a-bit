@@ -8,6 +8,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -45,7 +46,11 @@ public class UserRestCalls {
 
         Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
                 Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(1800 * 1000)));
-        users.saveSessionData(session);
+        try {
+            users.saveSessionData(session);
+        } catch (RuntimeException e) {
+            return Response.status(500).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
+        }
 
         NewCookie cookie = new NewCookie("sessionId", String.valueOf(session.getSessionId()),
                 "/Think-a-bit","localhost",1,"",1800,
@@ -77,8 +82,11 @@ public class UserRestCalls {
 
         Sessions session = new Sessions(user.getId(), UUID.randomUUID(),
                 Timestamp.from(Instant.now()), Timestamp.from(Instant.now().plusMillis(1800 * 1000)));
-        users.saveSessionData(session);
-
+        try {
+            users.saveSessionData(session);
+        } catch (RuntimeException e) {
+            return Response.status(500).entity("{\"msg\":\"" + e.getMessage() + "\"}").build();
+        }
 
         NewCookie cookie = new NewCookie("sessionId", String.valueOf(session.getSessionId()),
                 "/Think-a-bit","localhost",1,"",1800,
@@ -88,16 +96,16 @@ public class UserRestCalls {
 
     @POST
     @Path("/logout")
-    public Response logout(@CookieParam("sessionId") String sessionId) {
-        if (sessionId == null) { //or  is session has expired
+    public Response logout(@CookieParam("sessionId") Cookie cookie) {
+        if (cookie == null) {
             return Response.status(401).build();
         }
 
-        users.deleteSessionData(UUID.fromString(sessionId));
+        users.deleteSessionData(UUID.fromString(cookie.getValue()));
 
-        NewCookie cookie = new NewCookie("sessionId","","/Think-a-bit/users","localhost",
+        NewCookie cookie1 = new NewCookie("sessionId","","/Think-a-bit/users","localhost",
                 1,"",0, new Date(System.currentTimeMillis() - 10),false,true);
-        return Response.status(204).cookie(cookie).build();
+        return Response.status(204).cookie(cookie1).build();
     }
 
 //    @POST

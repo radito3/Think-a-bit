@@ -6,9 +6,12 @@ import org.elsys.netprog.model.*;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -100,6 +103,9 @@ public class GameHub implements Game {
                 new StageAttempts(stageId, userId, categoryId)));
         UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
+
+        if (currentStage != null) currentStage = null;
+
         return sa != null && up != null && stage != null &&
                 stage.getNumber() <= up.getReachedStage() && stageAvailability(sa) == 0;
     }
@@ -229,36 +235,29 @@ public class GameHub implements Game {
             setStageQuestions(currentStage);
         }
 
+        List<Answers> correct = db.getObject(s ->
+                s.createQuery("FROM Answers WHERE QuestionId = " + question.getId() + " AND IsCorrect = true")
+                        .getResultList());
+
         if (question.getType() == Question.Type.CLOSED_MANY) {
-            Stream<Answers> correct = db.getObject(s ->
-                    s.createQuery(getCorrectAnswerQuery(question)).getResultStream());
+            Stream<String> allAnswers = Stream.concat(correct.stream().map(Answers::getPayload), Arrays.stream(answers));
+            Set<String> unique = new HashSet<>();
 
-            Stream<String> allAnswers = Stream.concat(correct.map(Answers::getPayload), Arrays.stream(answers));
-
-            if (allAnswers.reduce((a, b) -> a.equals(b) ? "" : a).get().length() == 0) {
+            if (allAnswers.filter(s -> !unique.add(s)).collect(Collectors.toSet()).size() == 0) {
                 currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(true);
             } else {
                 currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(false);
             }
+        } else if (correct.get(0).getPayload().equals(answers[0])) {
+            currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(true);
         } else {
-            Answers correct = (Answers) db.getObject(s ->
-                    s.createQuery(getCorrectAnswerQuery(question)).uniqueResult());
-
-            if (correct.getPayload().equals(answers[0])) {
-                currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(true);
-            } else {
-                currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(false);
-            }
+            currentStage.getQuestions().get(getQuestionIndex(question)).setSolved(false);
         }
     }
 
     @Override
     public List<Question> getCurrentStageQuestions() {
         return currentStage.getQuestions();
-    }
-
-    private String getCorrectAnswerQuery(Question question) {
-        return "FROM Answers WHERE QuestionId = " + question.getId() + " AND IsCorrect = true";
     }
 
     @Override
