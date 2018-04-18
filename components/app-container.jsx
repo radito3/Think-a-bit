@@ -45,10 +45,9 @@ class AppContainer extends React.Component {
             <TopMenu/>
             <SideMenu/>
             <Switch>
-                <Route path="/" exact component={IndexPage} />
+                <Route path="/" exact component={CategoriesPage} />
                 <Route path="/login" component={LoginPage} />
                 <Route path="/register" component={RegisterPage} />
-                <Route path="/categories" component={CategoriesPage} />
                 <Route path="/stages" component={StagesPage} />
                 <Route path="/question" component={QuestionPage} />
                 <Route path="/result" component={ResultPage} />

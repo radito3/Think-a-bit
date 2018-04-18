@@ -48,7 +48,7 @@ class LoginPage extends React.Component {
                 this.props.login({
                     username: this.state.username
                 });
-                this.props.history.push("/categories");
+                this.props.history.push("/");
             } else if (response.status === 404) {
                 // todo: show error in user interface
                 console.log("Wrong credentials");

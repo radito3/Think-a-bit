@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 
 class ResultPage extends React.Component {
     render() {
@@ -12,10 +12,12 @@ class ResultPage extends React.Component {
                 {this.props.result.questions.map(question => {
                     return <p key={question}>{question}</p>;
                 })}
+                <Link to="/">Go back</Link>
             </div>;
         } else {
             return <div>
                 <h1>It's all correct! Good job!</h1>
+                <Link to="/">Go back</Link>
             </div>;
         }
     }

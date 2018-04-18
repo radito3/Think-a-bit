@@ -79,13 +79,15 @@ class StagesPage extends React.Component {
                             onClick={() => this.handleStageClick.bind(this, stage.id)()}
                             disabled={!stage.isReached || stage.availableAfter > 0}
                         >
-                            {stage.id}
+                            {stage.stageNumber}
                             <br />
                             {stage.availableAfter > 0 && `Available after ${stage.availableAfter} seconds`}
                             <br />
                             {!stage.isReached && <Lock />}
                             <br />
                             {!stage.isReached && "Complete all previous stages to unlock this one"}
+                            <br />
+                            {stage.isReached && `${stage.attempts} attempts left`}
                         </RaisedButton>
                     ))}
                 </GridList>
