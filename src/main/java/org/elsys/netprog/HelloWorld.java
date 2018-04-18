@@ -2,6 +2,7 @@ package org.elsys.netprog;
 
 import org.elsys.netprog.db.DatabaseUtil;
 import org.elsys.netprog.model.Categories;
+import org.elsys.netprog.model.Stages;
 import org.elsys.netprog.model.UserProgress;
 import org.elsys.netprog.view.JsonWrapper;
 
@@ -11,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -49,5 +51,14 @@ public class HelloWorld {
         long c = stream.count();
         long c1 = stream1.count();
         return Response.ok().entity("str1 length: " + c + ", str2 length: " + c1).build();
+    }
+
+    @GET
+    @Path("/3")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response test21() {
+        List<Stages> stages = DatabaseUtil.getInstance().getObject(s -> s.createQuery("FROM Stages WHERE " +
+                "CategoryId = " + 1 ).setFirstResult(2).getResultList());
+        return Response.status(200).entity(stages.get(0).getId()).build();
     }
 }

@@ -1,5 +1,7 @@
 package org.elsys.netprog.model;
 
+import org.elsys.netprog.game.RealConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,6 +26,7 @@ public class UserProgress implements Serializable {
 
     public UserProgress() {}
 
+    @RealConstructor(parameters = 2)
     public UserProgress(int userId, int categoryId) {
         this.UserId = userId;
         this.CategoryId = categoryId;

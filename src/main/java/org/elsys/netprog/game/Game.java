@@ -5,8 +5,8 @@ import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
 import org.elsys.netprog.model.Sessions;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+//import java.lang.reflect.Constructor;
+//import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,10 +93,34 @@ public interface Game {
         return DatabaseUtil.getInstance().getObject(s -> s.get(Sessions.class, sessionId)).getUserId();
     }
 
-    default <T> T buildObject(Class<T> clazz, int... params) throws IllegalAccessException, InstantiationException,
-            InvocationTargetException {
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        constructors[0].newInstance(params);
-        return clazz.newInstance();
-    }
+//    static <T> T buildObject(T clazz, int... params) throws IllegalAccessException, InvocationTargetException,
+//            InstantiationException, ClassNotFoundException {
+//        Class<?> cls = clazz.getClass();
+//        String name = clazz.getClass().getSimpleName();
+//        T obj = Class.forName(name).newInstance();
+//        Class<?> fromDb = DatabaseUtil.getInstance().getObject(s -> s.get(cls, ));
+//        Constructor<?>[] constructors = cls.getDeclaredConstructors();
+//        for (Constructor<?> constructor : constructors) {
+//            RealConstructor ra = constructor.getAnnotation(RealConstructor.class);
+//            int numParams = ra.parameters();
+//            if (constructor.getParameterCount() == numParams) {
+//                int[] realParams = new int[numParams];
+//                for (int i = 0; i < numParams; i++) {
+//
+//                }
+//                constructor.newInstance(params);
+//            }
+//        }
+//
+//        return null;
+//    }
+
+//    static <T> T buildObjectWithSupplier(Supplier<T> supplier) {
+//        T obj;
+//        if ((obj = DatabaseUtil.getInstance().getObject(s ->
+//                s.get(supplier.get().getClass(), (Serializable) supplier.get()))) == null) {
+//
+//        }
+//        return supplier.get();
+//    }
 }

@@ -1,5 +1,7 @@
 package org.elsys.netprog.model;
 
+import org.elsys.netprog.game.RealConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,6 +34,7 @@ public class StageAttempts implements Serializable {
 
     public StageAttempts() {}
 
+    @RealConstructor(parameters = 3)
     public StageAttempts(int stageId, int userId, int categoryId) {
         this.StageId = stageId;
         this.UserId = userId;

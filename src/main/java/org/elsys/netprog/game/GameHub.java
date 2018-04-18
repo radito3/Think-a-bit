@@ -77,6 +77,7 @@ public class GameHub implements Game {
             boolean isReached = up.getReachedStage() >= stage.getNumber();
             StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                     new StageAttempts(stage.getId(), userId, categoryId)));
+            //need to check if sa is not null
 
             json.append("{\"id\":").append(stage.getId())
                     .append(",\"isReached\":").append(isReached)
@@ -107,7 +108,7 @@ public class GameHub implements Game {
         if ((sa = db.getObject(s -> s.get(StageAttempts.class,
                 new StageAttempts(stage.getId(), userId, categoryId)))) == null) {
             sa = new StageAttempts(stage.getId(), userId, categoryId);
-        }
+        } //needs refactoring
 
         if (stage.getCategoryId() != categoryId) {
             throw new IllegalArgumentException("Wrong stage Id for this category");
@@ -116,7 +117,7 @@ public class GameHub implements Game {
         UserProgress up;
         if ((up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)))) == null) {
             up = new UserProgress(userId, categoryId);
-        }
+        } //needs refactoring
 
         if (stage.getNumber() <= up.getReachedStage() && stageAvailability(sa) == 0) {
             sa.setAttempts(FIRST_STAGE_ATTEMPTS - (stage.getNumber() - 1));
@@ -187,7 +188,8 @@ public class GameHub implements Game {
             UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
             up.setReachedStage(stage.getNumber() + 1);
             db.processObject(s -> s.update(up));
-            //TODO set next stage attempts
+
+            setNextStageAttempts(categoryId, stage.getNumber(), userId);
 
             sa.setAttempts(FIRST_STAGE_ATTEMPTS - (currentStage.getNumber() - 1));
         } else {
@@ -196,6 +198,17 @@ public class GameHub implements Game {
 
         sa.setLastAttempt(Timestamp.from(Instant.now()));
         db.processObject(s -> s.update(sa));
+    }
+
+    private void setNextStageAttempts(int categoryId, int stageNum, int userId) {
+        List<Stages> stages = db.getObject(s -> s.createQuery("FROM Stages WHERE CategoryId = " + categoryId)
+                .setFirstResult(stageNum + 1).getResultList());
+        if (stages.get(0) == null) { //if there are no more stages in this category
+            return;
+        }
+        StageAttempts sa = new StageAttempts(stages.get(0).getId(), userId, categoryId);
+        sa.setAttempts(FIRST_STAGE_ATTEMPTS - (stages.get(0).getNumber() - 1));
+        db.processObject(s -> s.saveOrUpdate(sa));
     }
 
     private int getQuestionIndex(Question question) {
@@ -254,6 +267,7 @@ public class GameHub implements Game {
             throw new IllegalArgumentException("Wrong stage Id for this category");
         }
         UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
+        //need to check if up is not null
 
         if (up.getReachedStage() < stage.getNumber() || stageAvailability(sa) > 0) {
             throw new IllegalAccessException("Stage is locked");
