@@ -81,7 +81,7 @@ public class GameHub implements Game {
                 sa = new StageAttempts(stage.getId(), userId, categoryId);
             } //needs refactoring
 
-            json.append("{\"stageId\":").append(stage.getId())
+            json.append("{\"id\":").append(stage.getId())
                     .append(",\"stageNumber\":").append(stage.getNumber())
                     .append(",\"isReached\":").append(isReached)
                     .append(",\"attempts\":").append(sa.getAttempts())

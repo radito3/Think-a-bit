@@ -47,7 +47,7 @@ class RegisterPage extends React.Component {
                 this.props.login({
                     username: this.state.username
                 });
-                this.props.history.push("/categories");
+                this.props.history.push("/");
             } else if (response.status === 412) {
                 // todo: show error in user interface
                 console.log("Username already taken");
