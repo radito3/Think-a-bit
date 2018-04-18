@@ -12,6 +12,7 @@ import StagesPage from "./stages-page.jsx";
 import QuestionPage from "./question-page.jsx";
 import SideMenu from "./side-menu.jsx";
 import TopMenu from "./top-menu.jsx";
+import ResultPage from "./result-page.jsx";
 
 class AppContainer extends React.Component {
 
@@ -50,6 +51,7 @@ class AppContainer extends React.Component {
                 <Route path="/categories" component={CategoriesPage} />
                 <Route path="/stages" component={StagesPage} />
                 <Route path="/question" component={QuestionPage} />
+                <Route path="/result" component={ResultPage} />
             </Switch>
         </div>;
     }
