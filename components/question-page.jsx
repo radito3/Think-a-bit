@@ -16,6 +16,7 @@ import {
     nextQuestion,
     previousQuestion
 } from "../store/actions/questions";
+import { setSessionExpired } from "../store/actions/authentication";
 import ClosedOneAnswer from "./closed-one-answer.jsx";
 import ClosedManyAnswer from "./closed-many-answer.jsx";
 import OpenAnswer from "./open-answer.jsx";
@@ -48,6 +49,7 @@ class QuestionPage extends React.Component {
         }).then(response => {
             if (response.status === 401) {
                 console.log("Session expired");
+                this.props.setSessionExpired(true);
             } else if (response.status === 403) {
                 console.log("Stage unavailable");
             } else if (response.status === 200) {
@@ -126,5 +128,6 @@ export default connect(store => {
     };
 }, {
     nextQuestion,
-    previousQuestion
+    previousQuestion,
+    setSessionExpired
  })(QuestionPage);

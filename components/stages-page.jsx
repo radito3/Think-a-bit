@@ -6,7 +6,9 @@ import {
     GridList,
     RaisedButton
 } from "material-ui";
+import Lock from "material-ui/svg-icons/action/lock";
 import { addQuestions } from "../store/actions/questions";
+import { setSessionExpired } from "../store/actions/authentication";
 import config from "../config.json";
 
 class StagesPage extends React.Component {
@@ -21,6 +23,7 @@ class StagesPage extends React.Component {
         }).then(response => {
             if (response.status === 401) {
                 console.log("Session expired");
+                this.props.setSessionExpired(true);
             } else if (response.status === 403) {
                 console.log("Stage unavailable");
             } else if (response.status === 200) {
@@ -67,8 +70,15 @@ class StagesPage extends React.Component {
                                 "width": "100%"
                             }}
                             onClick={() => this.handleStageClick.bind(this, stage.id)()}
+                            disabled={!stage.isReached || stage.availableAfter > 0}
                         >
                             {stage.id}
+                            <br />
+                            {stage.availableAfter > 0 && `Available after ${stage.availableAfter} seconds`}
+                            <br />
+                            {!stage.isReached && "Complete all previous stages to unlock this one"}
+                            <br />
+                            {!stage.isReached && <Lock />}
                         </RaisedButton>
                     ))}
                 </GridList>
@@ -84,4 +94,4 @@ export default withRouter(connect(store => {
     return {
         stages: store.stages
     };
-}, { addQuestions })(StagesPage));
+}, { addQuestions, setSessionExpired })(StagesPage));
