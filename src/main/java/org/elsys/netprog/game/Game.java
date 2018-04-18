@@ -5,6 +5,8 @@ import org.elsys.netprog.model.Categories;
 import org.elsys.netprog.model.Question;
 import org.elsys.netprog.model.Sessions;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,5 +91,12 @@ public interface Game {
      */
     default int getUserId(UUID sessionId) {
         return DatabaseUtil.getInstance().getObject(s -> s.get(Sessions.class, sessionId)).getUserId();
+    }
+
+    default <T> T buildObject(Class<T> clazz, int... params) throws IllegalAccessException, InstantiationException,
+            InvocationTargetException {
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        constructors[0].newInstance(params);
+        return clazz.newInstance();
     }
 }

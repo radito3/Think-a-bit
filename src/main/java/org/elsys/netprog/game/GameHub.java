@@ -77,7 +77,6 @@ public class GameHub implements Game {
             boolean isReached = up.getReachedStage() >= stage.getNumber();
             StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                     new StageAttempts(stage.getId(), userId, categoryId)));
-            assert sa != null;
 
             json.append("{\"id\":").append(stage.getId())
                     .append(",\"isReached\":").append(isReached)
@@ -104,13 +103,20 @@ public class GameHub implements Game {
     @Override
     public String playStage(int stageId, int userId, int categoryId) {
         Stages stage = db.getObject(s -> s.get(Stages.class, stageId));
-        StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
-                new StageAttempts(stage.getId(), userId, categoryId)));
-        if (sa == null) {
+        StageAttempts sa;
+        if ((sa = db.getObject(s -> s.get(StageAttempts.class,
+                new StageAttempts(stage.getId(), userId, categoryId)))) == null) {
+            sa = new StageAttempts(stage.getId(), userId, categoryId);
+        }
+
+        if (stage.getCategoryId() != categoryId) {
             throw new IllegalArgumentException("Wrong stage Id for this category");
         }
 
-        UserProgress up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)));
+        UserProgress up;
+        if ((up = db.getObject(s -> s.get(UserProgress.class, new UserProgress(userId, categoryId)))) == null) {
+            up = new UserProgress(userId, categoryId);
+        }
 
         if (stage.getNumber() <= up.getReachedStage() && stageAvailability(sa) == 0) {
             sa.setAttempts(FIRST_STAGE_ATTEMPTS - (stage.getNumber() - 1));
@@ -141,14 +147,14 @@ public class GameHub implements Game {
             List<Answers> answers = db.getObject(s ->
                     s.createQuery("FROM Answers WHERE QuestionId = " + question.getId()).list());
             answers.forEach(answer ->
-                    json.append("{\"content\":\"").append(answer.getPayload())
-                    .append("\",\"isCorrect\":").append(answer.getIsCorrect()).append("},")
+                    json.append("{\"content\":\"").append(answer.getPayload()).append("\"},")
             );
             json.deleteCharAt(json.lastIndexOf(","));
             json.append("]},");
         });
 
-        json.deleteCharAt(json.lastIndexOf(","));
+        if (json.lastIndexOf("[") != json.length() - 1)
+            json.deleteCharAt(json.lastIndexOf(","));
         json.append("]}");
         return json;
     }
