@@ -64,7 +64,6 @@ public class GameHub implements Game {
                 new StageAttempts(s.getId(), userId, categoryId)))));
         if (stageAttempts.get(0) == null) {
             stages.forEach(st -> db.processObject(s -> s.save(new StageAttempts(st.getId(), userId, categoryId))));
-            System.out.println("here");
         }
 
         return buildCategoryJson(categoryId, userId, up, category, stages).toString();
@@ -76,10 +75,11 @@ public class GameHub implements Game {
 
         stages.forEach(stage -> {
             boolean isReached = up.getReachedStage() >= stage.getNumber();
-            StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
-                    new StageAttempts(stage.getId(), userId, categoryId)));
-            //need to check if sa is not null
-            assert sa != null;
+            StageAttempts sa;
+            if ((sa = db.getObject(s -> s.get(StageAttempts.class,
+                    new StageAttempts(stage.getId(), userId, categoryId)))) == null) {
+                sa = new StageAttempts(stage.getId(), userId, categoryId);
+            } //needs refactoring
 
             json.append("{\"stageId\":").append(stage.getId())
                     .append(",\"stageNumber\":").append(stage.getNumber())
@@ -178,6 +178,7 @@ public class GameHub implements Game {
         List<Question> questions = new LinkedList<>();
 
         questionStages.forEach(qs -> questions.add(db.getObject(s -> s.get(Question.class, qs.getQuestionId()))));
+        questions.forEach(q -> System.out.println(q.getTitle()));
         stage.setQuestions(questions);
     }
 
