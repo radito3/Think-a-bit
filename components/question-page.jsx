@@ -80,6 +80,10 @@ class QuestionPage extends React.Component {
     }
 
     render() {
+        if (this.props.questions.questions.length <= 0) {
+            return <p>Sorry, an error has occurred</p>;
+        }
+
         let answer;
         switch (this.props.questions.questions[this.props.questions.currentQuestionIndex].type) {
             case "CLOSED_ONE":

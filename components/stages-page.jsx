@@ -9,11 +9,18 @@ import {
 import Lock from "material-ui/svg-icons/action/lock";
 import { addQuestions } from "../store/actions/questions";
 import { setSessionExpired } from "../store/actions/authentication";
+import { decrementAvailableAfter } from "../store/actions/stages";
 import config from "../config.json";
 
 class StagesPage extends React.Component {
     constructor(props) {
         super(props);
+
+        this.interval = setInterval(() => this.props.decrementAvailableAfter(), 1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
 
     handleStageClick(stageId) {
@@ -94,4 +101,4 @@ export default withRouter(connect(store => {
     return {
         stages: store.stages
     };
-}, { addQuestions, setSessionExpired })(StagesPage));
+}, { addQuestions, setSessionExpired, decrementAvailableAfter })(StagesPage));

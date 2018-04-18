@@ -17,6 +17,20 @@ const reducer = (state = { stages: [], category: "", selectedCategoryId: 0 }, ac
                 stages: [],
                 category: ""
             };
+        case "DECREMENT_AVAILABLE_AFTER":
+            return {
+                ...state,
+                stages: state.stages.map(stage => {
+                    if (stage.availableAfter > 0) {
+                        return {
+                            ...stage,
+                            availableAfter: stage.availableAfter - 1
+                        };
+                    } else {
+                        return stage;
+                    }
+                })
+            };
     }
     return state;
 };

@@ -15,7 +15,8 @@ class LogoutButton extends React.Component {
         this.props.setLoggingOut(true);
 
         fetch(`${config.url}:${config.port}/Think-a-bit/users/logout`, {
-            method: "POST"
+            method: "POST",
+            credentials: "same-origin"
         }).then(response => {
             this.props.setLoggingOut(false);
             this.props.logout();
