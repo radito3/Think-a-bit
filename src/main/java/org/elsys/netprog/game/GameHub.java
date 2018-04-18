@@ -64,6 +64,7 @@ public class GameHub implements Game {
                 new StageAttempts(s.getId(), userId, categoryId)))));
         if (stageAttempts.get(0) == null) {
             stages.forEach(st -> db.processObject(s -> s.save(new StageAttempts(st.getId(), userId, categoryId))));
+            System.out.println("here");
         }
 
         return buildCategoryJson(categoryId, userId, up, category, stages).toString();
@@ -78,8 +79,10 @@ public class GameHub implements Game {
             StageAttempts sa = db.getObject(s -> s.get(StageAttempts.class,
                     new StageAttempts(stage.getId(), userId, categoryId)));
             //need to check if sa is not null
+            assert sa != null;
 
-            json.append("{\"id\":").append(stage.getId())
+            json.append("{\"stageId\":").append(stage.getId())
+                    .append(",\"stageNumber\":").append(stage.getNumber())
                     .append(",\"isReached\":").append(isReached)
                     .append(",\"attempts\":").append(sa.getAttempts())
                     .append(",\"availableAfter\":").append(stageAvailability(sa))
