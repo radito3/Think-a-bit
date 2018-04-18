@@ -1,6 +1,9 @@
 import React from "react";
 import Helmet from "react-helmet";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 import { Route, Switch } from "react-router-dom";
+import { Dialog, FlatButton } from "material-ui";
 import IndexPage from "./index-page.jsx";
 import LoginPage from "./login-page.jsx";
 import RegisterPage from "./register-page.jsx";
@@ -26,6 +29,18 @@ class AppContainer extends React.Component {
                     height: 100%;
                 }
             `}</style></Helmet>
+            <Dialog
+                title="Session expired"
+                actions={[<FlatButton
+                    label="Authenticate"
+                    primary={true}
+                    onClick={() => this.props.history.push("/login")}
+                />]}
+                modal={true}
+                open={this.props.authentication.isSessionExpired}
+            >
+                Your session has expired. Please log in again!
+            </Dialog>
             <TopMenu/>
             <SideMenu/>
             <Switch>
@@ -40,4 +55,8 @@ class AppContainer extends React.Component {
     }
 }
 
-export default AppContainer;
+export default withRouter(connect(store => {
+    return {
+        authentication: store.authentication
+    };
+})(AppContainer));

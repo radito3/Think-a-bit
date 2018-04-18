@@ -1,4 +1,4 @@
-const reducer = (state = { username: "", isLoggingOut: false }, action) => {
+const reducer = (state = { username: "", isLoggingOut: false, isSessionExpired: false }, action) => {
     switch (action.type) {
         case "LOGIN":
             return {
@@ -9,6 +9,11 @@ const reducer = (state = { username: "", isLoggingOut: false }, action) => {
             return {
                 ...state,
                 isLoggingOut: action.payload
+            };
+        case "SET_SESSION_EXPIRED":
+            return {
+                ...state,
+                isSessionExpired: action.payload
             };
         case "LOGOUT":
             return {

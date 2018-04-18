@@ -16,8 +16,16 @@ function setLoggingOut(isLoggingOut) {
     };
 }
 
+function setSessionExpired(isSessionExpired) {
+    return {
+        type: "SET_SESSION_EXPIRED",
+        payload: isSessionExpired
+    };
+}
+
 export {
     login,
     logout,
-    setLoggingOut
+    setLoggingOut,
+    setSessionExpired
 };

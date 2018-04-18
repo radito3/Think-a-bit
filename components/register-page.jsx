@@ -3,7 +3,7 @@ import { TextField } from "material-ui";
 import { Grid, Row, Col } from "react-flexbox-grid";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { login } from "../store/actions/authentication";
+import { login, setSessionExpired } from "../store/actions/authentication";
 import formurlencoded from "form-urlencoded";
 import config from "../config";
 import FormSubmitButton from "./form-submit-button.jsx";
@@ -19,6 +19,8 @@ class RegisterPage extends React.Component {
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        this.props.setSessionExpired(false);
     }
 
     handleSubmit() {
@@ -99,4 +101,4 @@ export default withRouter(connect(store => {
     return {
         authentication: store.authentication
     };
-}, { login })(RegisterPage));
+}, { login, setSessionExpired })(RegisterPage));
